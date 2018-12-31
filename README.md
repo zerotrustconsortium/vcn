@@ -1,6 +1,6 @@
 # vcn-cli
 
-GOing to take over the world.
+Global, de-centralized certification of digital assets
 
 ## Development
 
