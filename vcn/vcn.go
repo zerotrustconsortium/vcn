@@ -107,6 +107,8 @@ func verify(filename string) {
 	if jsonErr != nil {
 		log.Fatal(jsonErr)
 	}
+	// TO DO: Trust level= ?? mb, also this should also go to STDOUT, 
+	// and also handle STDERR so it can be fully scripted
 	fmt.Println("Trust status:", verification.Message)
 
 }
