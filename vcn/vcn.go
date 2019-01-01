@@ -11,15 +11,9 @@
 package main
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
-	"net/http"
 	"os"
-	"time"
 
 	"github.com/urfave/cli"
 )
@@ -51,6 +45,7 @@ func main() {
 			Usage:    "commit in blockchain",
 			Action: func(c *cli.Context) error {
 				fmt.Println("committed artifact: ", c.Args().First())
+				commit(c.Args().First(), c.Args().Get(1))
 				return nil
 			},
 		},
@@ -60,55 +55,4 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-type response struct {
-	Message string `json:"message"`
-}
-
-func verify(filename string) {
-	fmt.Println("File: ", filename)
-
-	// TODO: large files
-	// https://stackoverflow.com/questions/15879136/how-to-calculate-sha256-file-checksum-in-go
-	hasher := sha256.New()
-	s, err := ioutil.ReadFile(filename)
-	hasher.Write(s)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	hash := hex.EncodeToString(hasher.Sum(nil))
-	fmt.Println("Hash: ", hash)
-
-	url := "http://api.vchain.us/v1/files/" + hash
-
-	vcnClient := http.Client{
-		Timeout: time.Second * 2, // Maximum of 2 secs
-	}
-
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	res, getErr := vcnClient.Do(req)
-	if getErr != nil {
-		log.Fatal(getErr)
-	}
-
-	body, readErr := ioutil.ReadAll(res.Body)
-	if readErr != nil {
-		log.Fatal(readErr)
-	}
-
-	verification := response{}
-	jsonErr := json.Unmarshal(body, &verification)
-	if jsonErr != nil {
-		log.Fatal(jsonErr)
-	}
-	// TO DO: Trust level= ?? mb, also this should also go to STDOUT, 
-	// and also handle STDERR so it can be fully scripted
-	fmt.Println("Trust status:", verification.Message)
-
 }
