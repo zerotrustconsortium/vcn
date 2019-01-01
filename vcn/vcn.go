@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 vChain, Inc. All Rights Reserved.
+ * Copyright (c) 2018-2019 vChain, Inc. All Rights Reserved.
  * This software is released under GPL3.
  * The full license information can be found under:
  * https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -107,6 +107,8 @@ func verify(filename string) {
 	if jsonErr != nil {
 		log.Fatal(jsonErr)
 	}
+	// TO DO: Trust level= ?? mb, also this should also go to STDOUT, 
+	// and also handle STDERR so it can be fully scripted
 	fmt.Println("Trust status:", verification.Message)
 
 }
