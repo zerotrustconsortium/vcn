@@ -45,7 +45,8 @@ func main() {
 			Usage:    "commit in blockchain",
 			Action: func(c *cli.Context) error {
 				fmt.Println("committed artifact: ", c.Args().First())
-				commit(c.Args().First(), c.Args().Get(1))
+				//commit(c.Args().First(), c.Args().Get(1))
+				commit(c.Args().First(), "vchain:vChain123")
 				return nil
 			},
 		},

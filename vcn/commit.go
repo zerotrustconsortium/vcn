@@ -18,6 +18,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 )
 
 func commit(filename string, auth string) {
@@ -44,6 +45,10 @@ func commit(filename string, auth string) {
 	req.Header.Set("Authorization", fmt.Sprintf("Basic %s", b64str))
 
 	client := &http.Client{}
+
+	// fire off a parallel goroutine
+	go displayLatency()
+
 	resp, err := client.Do(req)
 	if err != nil {
 		panic(err)
@@ -62,8 +67,19 @@ func commit(filename string, auth string) {
 		log.Fatal(jsonErr)
 	}
 
+	fmt.Println()
 	fmt.Println("Commit status:", commit.Message)
 
 	fmt.Println("Block:", commit.Block)
 
+}
+
+func displayLatency() {
+	i := 0
+	for {
+		i++
+		fmt.Printf("\033[2K\rWaiting for block: %02dsec", i)
+		//fmt.Println(i)
+		time.Sleep(1 * time.Second)
+	}
 }

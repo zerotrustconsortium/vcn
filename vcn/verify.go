@@ -16,7 +16,10 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 	"time"
+
+	"github.com/fatih/color"
 )
 
 type response struct {
@@ -56,6 +59,12 @@ func verify(filename string) {
 	}
 	// TO DO: Trust level= ?? mb, also this should also go to STDOUT,
 	// and also handle STDERR so it can be fully scripted
-	fmt.Println("Trust status:", verification.Message)
 
+	trust := strings.TrimSpace(verification.Message)
+
+	color.Set(color.FgHiWhite, color.BgCyan, color.Bold)
+	fmt.Print("Trust status:", trust)
+	color.Unset()
+
+	fmt.Println()
 }
