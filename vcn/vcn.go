@@ -24,6 +24,12 @@ func main() {
 	app.Version = "0.0.1"
 
 	app.Commands = []cli.Command{
+		// possible commands:
+		// trace <artifact>
+		// list <pubkey>
+		// search <block>
+		// display validators
+
 		{
 			Category: "Artifact actions",
 			Name:     "verify",
@@ -48,6 +54,20 @@ func main() {
 				//commit(c.Args().First(), c.Args().Get(1))
 				commit(c.Args().First(), "vchain:vChain123")
 				return nil
+			},
+		},
+		{
+			Category: "Blockchain actions",
+			Name:     "new",
+			Aliases:  []string{"n"},
+			Usage:    "create a key store in .vcn-wallet",
+			Action: func(c *cli.Context) error {
+				//fmt.Println("verified artifact: ", c.Args().First())
+				createKs()
+				return nil
+			},
+			Flags: []cli.Flag{
+				cli.BoolFlag{Name: "hash"},
 			},
 		},
 	}

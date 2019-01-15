@@ -18,7 +18,10 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"time"
+
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 func commit(filename string, auth string) {
@@ -75,11 +78,16 @@ func commit(filename string, auth string) {
 }
 
 func displayLatency() {
-	i := 0
-	for {
-		i++
-		fmt.Printf("\033[2K\rWaiting for block: %02dsec", i)
-		//fmt.Println(i)
-		time.Sleep(1 * time.Second)
+
+	// only display the counter if we're in a terminal
+	// and not let's say piping into a file
+	if terminal.IsTerminal(int(os.Stdout.Fd())) {
+		i := 0
+		for {
+			i++
+			fmt.Printf("\033[2K\rWaiting for block: %02dsec", i)
+			//fmt.Println(i)
+			time.Sleep(1 * time.Second)
+		}
 	}
 }
