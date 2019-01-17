@@ -26,6 +26,11 @@ type response struct {
 	Message string `json:"message"`
 }
 
+func verifyAll() {
+	// find . -type f -name "*.go" | xargs -I % vcn verify %
+	//for --> verify
+}
+
 func verify(filename string) {
 	fmt.Println("File: ", filename)
 
@@ -67,4 +72,9 @@ func verify(filename string) {
 	color.Unset()
 
 	fmt.Println()
+
+	// how to use stderr and exit codes
+	//fmt.Fprintln(os.Stderr, "err")
+	//os.Exit(1)
+
 }

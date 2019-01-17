@@ -31,13 +31,14 @@ func main() {
 		// display validators
 
 		{
+			// find . -type f -name "*.go" | xargs -I % vcn verify %
 			Category: "Artifact actions",
 			Name:     "verify",
 			Aliases:  []string{"v"},
 			Usage:    "verify against blockchain",
 			Action: func(c *cli.Context) error {
 				fmt.Println("verified artifact: ", c.Args().First())
-				verify(c.Args().First())
+				verifyAll(c.Args())
 				return nil
 			},
 			Flags: []cli.Flag{

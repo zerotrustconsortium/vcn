@@ -13,18 +13,38 @@ package main
 import (
 	"fmt"
 	"log"
+	"syscall"
 
 	"github.com/ethereum/go-ethereum/accounts/keystore"
+	"github.com/fatih/color"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 // https://github.com/miguelmota/ethereum-development-with-go-book/blob/master/en/keystore/README.md
 func createKs() {
+
 	ks := keystore.NewKeyStore("./.vcn-wallet", keystore.StandardScryptN, keystore.StandardScryptP)
-	password := "secret"
+
+	fmt.Print("Choose a password: ")
+	bytePassword, err := terminal.ReadPassword(int(syscall.Stdin))
+	password := string(bytePassword)
+	fmt.Println(".")
+
 	account, err := ks.NewAccount(password)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println(account.Address.Hex()) // 0x20F8D42FB0F667F2E53930fed426f225752453b3
+	output(account.Address.Hex())
+
+	fmt.Println("I've also put it to ./.vcn-wallet")
+
+}
+func output(addr string) {
+	fmt.Print("Okay, that's your public key: ")
+	color.Set(color.FgHiWhite, color.BgCyan, color.Bold)
+
+	fmt.Printf("%s", addr)
+	color.Unset()
+	fmt.Println("")
 }
