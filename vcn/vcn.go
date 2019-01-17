@@ -37,7 +37,7 @@ func main() {
 			Aliases:  []string{"v"},
 			Usage:    "verify against blockchain",
 			Action: func(c *cli.Context) error {
-				fmt.Println("verified artifact: ", c.Args().First())
+				//fmt.Println("verified artifact: ", c.Args())
 				verifyAll(c.Args())
 				return nil
 			},

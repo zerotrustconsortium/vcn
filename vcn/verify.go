@@ -26,13 +26,17 @@ type response struct {
 	Message string `json:"message"`
 }
 
-func verifyAll() {
+func verifyAll(files []string) {
 	// find . -type f -name "*.go" | xargs -I % vcn verify %
 	//for --> verify
+	//fmt.Println(files)
+	for i := 0; i < len(files); i++ {
+		//fmt.Println(i)
+		verify(files[i])
+	}
 }
 
 func verify(filename string) {
-	fmt.Println("File: ", filename)
 
 	hash := hash(filename)
 
@@ -67,8 +71,16 @@ func verify(filename string) {
 
 	trust := strings.TrimSpace(verification.Message)
 
-	color.Set(color.FgHiWhite, color.BgCyan, color.Bold)
-	fmt.Print("Trust status:", trust)
+	fmt.Println("File:", filename)
+	fmt.Println("Hash:", strings.TrimSpace(hash))
+	fmt.Print("      ")
+	if trust == "ok" {
+		color.Set(color.FgHiWhite, color.BgCyan, color.Bold)
+	} else if trust == "Not found" {
+		color.Set(color.FgHiWhite, color.BgRed, color.Bold)
+	}
+
+	fmt.Print("Trust:", trust)
 	color.Unset()
 
 	fmt.Println()
