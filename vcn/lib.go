@@ -13,7 +13,6 @@ package main
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
 	"io/ioutil"
 	"log"
 )
@@ -30,7 +29,7 @@ func hash(filename string) string {
 	}
 
 	hash := hex.EncodeToString(hasher.Sum(nil))
-	fmt.Println("Hash: ", hash)
+	//fmt.Println("Hash: ", hash)
 
 	return hash
 }
