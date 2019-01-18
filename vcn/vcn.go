@@ -58,10 +58,10 @@ func main() {
 			},
 		},
 		{
-			Category: "Blockchain actions",
-			Name:     "new",
-			Aliases:  []string{"n"},
-			Usage:    "create a key store in .vcn-wallet",
+			Category: "User actions",
+			Name:     "init",
+			Aliases:  []string{"i"},
+			Usage:    "Initialize your working directory.",
 			Action: func(c *cli.Context) error {
 				//fmt.Println("verified artifact: ", c.Args().First())
 				createKs()

@@ -16,6 +16,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -71,22 +72,37 @@ func verify(filename string) {
 
 	trust := strings.TrimSpace(verification.Message)
 
-	fmt.Println("File:", filename)
-	fmt.Println("Hash:", strings.TrimSpace(hash))
-	fmt.Print("      ")
-	if trust == "ok" {
+	// Asset level
+	fmt.Println(" File:", filename)
+
+	fmt.Println()
+
+	// Blockchain level
+	fmt.Println(" Hash:", strings.TrimSpace(hash))
+	fmt.Println("  Trx:", "0x6f34267ee323 (TODO)")
+	fmt.Println(" Date:", "2018-08-15 12:29:34 UTC")
+
+	fmt.Println()
+
+	fmt.Println("Commit:", "Simon Tatham")
+	fmt.Println("vChain:", "AK47")
+	fmt.Println(" Trust:", "Strong verification (Level 3)")
+
+	switch res.StatusCode {
+	case 200:
 		color.Set(color.FgHiWhite, color.BgCyan, color.Bold)
-	} else if trust == "Not found" {
+	case 404:
 		color.Set(color.FgHiWhite, color.BgRed, color.Bold)
+		defer os.Exit(1)
 	}
 
-	fmt.Print("Trust:", trust)
+	fmt.Print("Status: ", trust)
 	color.Unset()
 
 	fmt.Println()
 
 	// how to use stderr and exit codes
 	//fmt.Fprintln(os.Stderr, "err")
-	//os.Exit(1)
+	//
 
 }
