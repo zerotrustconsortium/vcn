@@ -38,11 +38,10 @@ func commit(filename string, auth string) {
 	b64data := []byte(auth)
 	b64str := base64.StdEncoding.EncodeToString(b64data)
 
-	url := "http://api.vchain.us/v1/files"
-
 	var jsonStr = []byte(fmt.Sprintf(`{"hash":"%s", "owner":"na"}`, hash))
 
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
+	req, err := http.NewRequest("POST", ApiEndpoint("files"),
+		bytes.NewBuffer(jsonStr))
 
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", fmt.Sprintf("Basic %s", b64str))

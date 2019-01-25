@@ -41,13 +41,11 @@ func verify(filename string) {
 
 	hash := hash(filename)
 
-	url := "http://api.vchain.us/v1/files/" + hash
-
 	vcnClient := http.Client{
 		Timeout: time.Second * 2, // Maximum of 2 secs
 	}
 
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+	req, err := http.NewRequest(http.MethodGet, ApiEndpoint("files/"+hash), nil)
 	if err != nil {
 		log.Fatal(err)
 	}
