@@ -13,23 +13,21 @@ package main
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"io/ioutil"
+	"io"
 	"log"
+	"os"
 )
 
 func hash(filename string) string {
-
-	// TODO: large files
-	// https://stackoverflow.com/questions/15879136/how-to-calculate-sha256-file-checksum-in-go
-	hasher := sha256.New()
-	s, err := ioutil.ReadFile(filename)
-	hasher.Write(s)
+	file, err := os.Open(filename)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	hash := hex.EncodeToString(hasher.Sum(nil))
-	//fmt.Println("Hash: ", hash)
-
-	return hash
+	defer file.Close()
+	h := sha256.New()
+	if _, err := io.Copy(h, file); err != nil {
+		log.Fatal(err)
+	}
+	checksum := h.Sum(nil)
+	return hex.EncodeToString(checksum)
 }
