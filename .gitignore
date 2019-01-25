@@ -16,3 +16,10 @@
 
 # Compiled binaries
 vcn/vcn
+
+# IntelliJ
+*.iml
+.idea/
+
+# Vim
+*.swp
