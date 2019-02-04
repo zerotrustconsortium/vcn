@@ -10,6 +10,8 @@
 
 package main
 
-func ApiEndpoint(method string) string {
-	return "https://api.vchain.us/v1/" + method;
+// APIEndpoint REST API
+// api to access blockchain via gw
+func APIEndpoint(method string) string {
+	return "https://api.vchain.us/v1/" + method
 }

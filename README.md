@@ -4,8 +4,6 @@ Global, de-centralized certification of digital assets
 
 ## Development
 
-
-
 Clone this directory into your `GOPATH`, usually this is `$HOME/go/src/`
 
 ### PATH
@@ -28,11 +26,26 @@ $> cd vcn-cli/vcn
 $> go install
 ```
 
+### Test Automation
+Simply run
+
+```
+$> go test
+```
+
+### Smart contracts
+
+```
+$ solc --abi Proof.sol -o build
+$ abigen --abi=./contracts/build/Proof.abi --pkg proof --out=Proof.go
+```
+
+
 ## Usage
 
 ```
 $> vcn --help
-$> vcn commit <file> [user]:[password]
+$> vcn commit <file> 
 $> vcn verify <file>
 ```
 

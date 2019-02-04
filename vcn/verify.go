@@ -20,6 +20,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/ethclient"
+
+	"vcn-cli/vcn/proof"
+
 	"github.com/fatih/color"
 )
 
@@ -45,7 +50,7 @@ func verify(filename string) {
 		Timeout: time.Second * 2, // Maximum of 2 secs
 	}
 
-	req, err := http.NewRequest(http.MethodGet, ApiEndpoint("files/"+hash), nil)
+	req, err := http.NewRequest(http.MethodGet, APIEndpoint("files/"+hash), nil)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -103,4 +108,34 @@ func verify(filename string) {
 	//fmt.Fprintln(os.Stderr, "err")
 	//
 
+}
+
+func sc(filename string) {
+
+	fmt.Println(123)
+
+	//fileHash := "181210f8f9c779c26da1d9b2075bde0127302ee0e3fca38c9a83f5b1dd8e5d3b"
+
+	client, err := ethclient.Dial("https://main.vchain.us")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	address := common.HexToAddress("0xb80d1020ba5846cf975ad3b763e7615584e5234f")
+	instance, err := proof.NewProof(address, client)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("contract is loaded")
+	fmt.Println(instance)
+
+	//caller := new(proof.CallerCallOpts)
+
+	//ret, err := instance.Get(caller, fileHash)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+
+	//fmt.Println(ret)
 }

@@ -40,7 +40,7 @@ func commit(filename string, auth string) {
 
 	var jsonStr = []byte(fmt.Sprintf(`{"hash":"%s", "owner":"na"}`, hash))
 
-	req, err := http.NewRequest("POST", ApiEndpoint("files"),
+	req, err := http.NewRequest("POST", APIEndpoint("files"),
 		bytes.NewBuffer(jsonStr))
 
 	req.Header.Set("Content-Type", "application/json")

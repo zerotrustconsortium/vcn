@@ -4,8 +4,6 @@
  * The full license information can be found under:
  * https://www.gnu.org/licenses/gpl-3.0.en.html
  *
- * Built on top of CLI (MIT license)
- * https://github.com/urfave/cli#overview
  */
 
 package main
