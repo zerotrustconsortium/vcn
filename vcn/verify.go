@@ -23,7 +23,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 
-	"vcn/proof"
+	"../proof"
 
 	"github.com/fatih/color"
 )
