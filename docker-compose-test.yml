@@ -2,9 +2,9 @@ version: '3.7'
 services:
   vcn:
     image: golang:1.11.5-stretch
-    entrypoint: "sh -c 'mkdir -p /tmp/bin && cd vcn && go get -v && go build -v && go test -v'"
+    entrypoint: "sh -c 'mkdir -p /tmp/bin /tmp/vcn && cd vcn/vcn && go get -v && go build -v && go test -v'"
     environment:
       GOPATH: /tmp
       GOBIN: /tmp/bin
     volumes: 
-      - "./:/go"
+      - "./:/go/vcn"
