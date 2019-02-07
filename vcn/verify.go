@@ -20,8 +20,6 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fatih/color"
-
-	"../proof"
 )
 
 func verifyAll(files []string) {
@@ -59,7 +57,7 @@ func verifyHash(hash string) (verified bool, owner string, timestamp int64) {
 		log.Fatal(err)
 	}
 	address := common.HexToAddress(ProofContractAddress())
-	instance, err := proof.NewProof(address, client)
+	instance, err := NewProof(address, client)
 	if err != nil {
 		log.Fatal(err)
 	}
