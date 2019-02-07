@@ -47,17 +47,6 @@ func main() {
 		},
 		{
 			Category: "Artifact actions",
-			Name:     "sc",
-			//Aliases:  []string{"v"},
-			Usage: "interact with smart contract",
-			Action: func(c *cli.Context) error {
-				//fmt.Println("verified artifact: ", c.Args())
-				sc(c.Args().First())
-				return nil
-			},
-		},
-		{
-			Category: "Artifact actions",
 			Name:     "commit",
 			Aliases:  []string{"c"},
 			Usage:    "commit in blockchain",

@@ -10,8 +10,14 @@
 
 package main
 
-// APIEndpoint REST API
-// api to access blockchain via gw
 func APIEndpoint(method string) string {
 	return "https://api.vchain.us/v1/" + method
+}
+
+func MainNetEndpoint() string {
+	return "https://main.vchain.us"
+}
+
+func ProofContractAddress() string {
+	return "0x66ccf074254cb0eb8d9e8020d8e777406a1d9cbb"
 }
