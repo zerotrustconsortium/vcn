@@ -35,7 +35,7 @@ func createKs() {
 
 	output(account.Address.Hex())
 
-	fmt.Println("I've also put it to %s", WalletDirectory())
+	fmt.Println("I've also put it to", WalletDirectory())
 
 }
 func output(addr string) {
