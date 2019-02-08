@@ -23,8 +23,8 @@ import (
 )
 
 func VerifyAll(files []string) {
-	for i := 0; i < len(files); i++ {
-		Verify(files[i])
+	for _, file := range files {
+		Verify(file)
 	}
 }
 
