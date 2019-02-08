@@ -33,9 +33,9 @@ func main() {
 			Category: "Artifact actions",
 			Name:     "verify",
 			Aliases:  []string{"v"},
-			Usage:    "verify against blockchain",
+			Usage:    "Verify against blockchain",
 			Action: func(c *cli.Context) error {
-				verifyAll(c.Args())
+				VerifyAll(c.Args())
 				return nil
 			},
 			Flags: []cli.Flag{
@@ -46,7 +46,7 @@ func main() {
 			Category: "Artifact actions",
 			Name:     "commit",
 			Aliases:  []string{"c"},
-			Usage:    "commit in blockchain",
+			Usage:    "Commit in blockchain",
 			Action: func(c *cli.Context) error {
 				Commit(c.Args().First(), "me")
 				return nil

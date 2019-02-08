@@ -22,13 +22,13 @@ import (
 	"github.com/fatih/color"
 )
 
-func verifyAll(files []string) {
+func VerifyAll(files []string) {
 	for i := 0; i < len(files); i++ {
-		verify(files[i])
+		Verify(files[i])
 	}
 }
 
-func verify(filename string) {
+func Verify(filename string) {
 	hash := strings.TrimSpace(hash(filename))
 	verified, owner, timestamp := verifyHash(hash)
 	fmt.Println("File:\t", filename)
