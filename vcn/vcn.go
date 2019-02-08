@@ -48,7 +48,7 @@ func main() {
 			Aliases:  []string{"c"},
 			Usage:    "commit in blockchain",
 			Action: func(c *cli.Context) error {
-				commit(c.Args().First(), "me")
+				Commit(c.Args().First(), "me")
 				return nil
 			},
 		},

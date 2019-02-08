@@ -23,7 +23,7 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 )
 
-func commit(filename string, owner string) {
+func Commit(filename string, owner string) {
 	hash := hash(filename)
 	commitHash(hash, owner)
 	fmt.Println("File:\t", filename)
