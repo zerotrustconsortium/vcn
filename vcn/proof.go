@@ -28,7 +28,7 @@ var (
 )
 
 // ProofABI is the input ABI used to generate the binding from.
-const ProofABI = "[{\"constant\":true,\"inputs\":[{\"name\":\"fileHash\",\"type\":\"string\"}],\"name\":\"get\",\"outputs\":[{\"name\":\"timestamp\",\"type\":\"uint256\"},{\"name\":\"owner\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"owner\",\"type\":\"string\"},{\"name\":\"fileHash\",\"type\":\"string\"}],\"name\":\"set\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"status\",\"type\":\"bool\"},{\"indexed\":false,\"name\":\"timestamp\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"owner\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"fileHash\",\"type\":\"string\"}],\"name\":\"logFileAddedStatus\",\"type\":\"event\"}]"
+const ProofABI = "[{\"constant\":true,\"inputs\":[],\"name\":\"get_timestamp\",\"outputs\":[{\"name\":\"timestamp\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"fileHash\",\"type\":\"string\"}],\"name\":\"get\",\"outputs\":[{\"name\":\"timestamp\",\"type\":\"uint256\"},{\"name\":\"owner\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"owner\",\"type\":\"string\"},{\"name\":\"fileHash\",\"type\":\"string\"}],\"name\":\"set\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"status\",\"type\":\"bool\"},{\"indexed\":false,\"name\":\"timestamp\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"owner\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"fileHash\",\"type\":\"string\"}],\"name\":\"logFileAddedStatus\",\"type\":\"event\"}]"
 
 // Proof is an auto generated Go binding around an Ethereum contract.
 type Proof struct {
@@ -206,6 +206,32 @@ func (_Proof *ProofCallerSession) Get(fileHash string) (struct {
 	Owner     string
 }, error) {
 	return _Proof.Contract.Get(&_Proof.CallOpts, fileHash)
+}
+
+// GetTimestamp is a free data retrieval call binding the contract method 0x2212dbc3.
+//
+// Solidity: function get_timestamp() constant returns(uint256 timestamp)
+func (_Proof *ProofCaller) GetTimestamp(opts *bind.CallOpts) (*big.Int, error) {
+	var (
+		ret0 = new(*big.Int)
+	)
+	out := ret0
+	err := _Proof.contract.Call(opts, out, "get_timestamp")
+	return *ret0, err
+}
+
+// GetTimestamp is a free data retrieval call binding the contract method 0x2212dbc3.
+//
+// Solidity: function get_timestamp() constant returns(uint256 timestamp)
+func (_Proof *ProofSession) GetTimestamp() (*big.Int, error) {
+	return _Proof.Contract.GetTimestamp(&_Proof.CallOpts)
+}
+
+// GetTimestamp is a free data retrieval call binding the contract method 0x2212dbc3.
+//
+// Solidity: function get_timestamp() constant returns(uint256 timestamp)
+func (_Proof *ProofCallerSession) GetTimestamp() (*big.Int, error) {
+	return _Proof.Contract.GetTimestamp(&_Proof.CallOpts)
 }
 
 // Set is a paid mutator transaction binding the contract method 0xe942b516.
