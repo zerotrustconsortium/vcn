@@ -11,7 +11,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -31,13 +30,11 @@ func main() {
 		// display validators
 
 		{
-			// find . -type f -name "*.go" | xargs -I % vcn verify %
 			Category: "Artifact actions",
 			Name:     "verify",
 			Aliases:  []string{"v"},
 			Usage:    "verify against blockchain",
 			Action: func(c *cli.Context) error {
-				//fmt.Println("verified artifact: ", c.Args())
 				verifyAll(c.Args())
 				return nil
 			},
@@ -51,9 +48,7 @@ func main() {
 			Aliases:  []string{"c"},
 			Usage:    "commit in blockchain",
 			Action: func(c *cli.Context) error {
-				fmt.Println("committed artifact: ", c.Args().First())
-				//commit(c.Args().First(), c.Args().Get(1))
-				commit(c.Args().First(), "vchain:vChain123")
+				commit(c.Args().First(), "me")
 				return nil
 			},
 		},
@@ -63,7 +58,6 @@ func main() {
 			Aliases:  []string{"i"},
 			Usage:    "Initialize your working directory.",
 			Action: func(c *cli.Context) error {
-				//fmt.Println("verified artifact: ", c.Args().First())
 				createKs()
 				return nil
 			},

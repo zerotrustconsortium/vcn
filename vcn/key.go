@@ -21,7 +21,7 @@ import (
 // https://github.com/miguelmota/ethereum-development-with-go-book/blob/master/en/keystore/README.md
 func createKs() {
 
-	ks := keystore.NewKeyStore("./.vcn-wallet", keystore.StandardScryptN, keystore.StandardScryptP)
+	ks := keystore.NewKeyStore(WalletDirectory(), keystore.StandardScryptN, keystore.StandardScryptP)
 
 	fmt.Print("Choose a password: ")
 	bytePassword, err := terminal.ReadPassword(int(syscall.Stdin))
@@ -35,7 +35,7 @@ func createKs() {
 
 	output(account.Address.Hex())
 
-	fmt.Println("I've also put it to ./.vcn-wallet")
+	fmt.Println("I've also put it to %s", WalletDirectory())
 
 }
 func output(addr string) {

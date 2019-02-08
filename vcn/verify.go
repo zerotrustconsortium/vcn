@@ -41,10 +41,10 @@ func verify(filename string) {
 	}
 	if verified {
 		color.Set(color.FgHiWhite, color.BgCyan, color.Bold)
-		fmt.Print("TRUSTED")
+		fmt.Print("VERIFIED")
 	} else {
-		color.Set(color.FgHiWhite, color.BgRed, color.Bold)
-		fmt.Print("UNTRUSTED")
+		color.Set(color.FgHiWhite, color.BgMagenta, color.Bold)
+		fmt.Print("UNKNOWN")
 		defer os.Exit(1)
 	}
 	color.Unset()

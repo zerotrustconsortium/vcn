@@ -11,82 +11,80 @@
 package main
 
 import (
-	"bytes"
-	"encoding/base64"
-	"encoding/json"
+	"context"
 	"fmt"
-	"io/ioutil"
 	"log"
-	"net/http"
-	"os"
+	"syscall"
 	"time"
 
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/ethclient"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
-func commit(filename string, auth string) {
-
-	type response struct {
-		Message         string `json:"message"`
-		TransactionHash string `json:"transaction-hash"`
-		Block           string `json:"block"`
-	}
-
-	fmt.Println("File: ", filename)
-
+func commit(filename string, owner string) {
 	hash := hash(filename)
-	b64data := []byte(auth)
-	b64str := base64.StdEncoding.EncodeToString(b64data)
-
-	var jsonStr = []byte(fmt.Sprintf(`{"hash":"%s", "owner":"na"}`, hash))
-
-	req, err := http.NewRequest("POST", APIEndpoint("files"),
-		bytes.NewBuffer(jsonStr))
-
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Basic %s", b64str))
-
-	client := &http.Client{}
-
-	// fire off a parallel goroutine
-	go displayLatency()
-
-	resp, err := client.Do(req)
-	if err != nil {
-		panic(err)
-	}
-	defer resp.Body.Close()
-
-	//fmt.Println("response Status:", resp.Status)
-	//fmt.Println("response Headers:", resp.Header)
-	body, _ := ioutil.ReadAll(resp.Body)
-
-	//fmt.Println("response Body:", string(body))
-
-	commit := response{}
-	jsonErr := json.Unmarshal(body, &commit)
-	if jsonErr != nil {
-		log.Fatal(jsonErr)
-	}
-
-	fmt.Println()
-	fmt.Println("Commit status:", commit.Message)
-
-	fmt.Println("Block:", commit.Block)
-
+	commitHash(hash, owner)
+	fmt.Println("File:\t", filename)
+	fmt.Println("Hash:\t", hash)
+	fmt.Println("Date:\t", time.Now())
+	fmt.Println("Signer:\t", owner)
 }
 
-func displayLatency() {
-
-	// only display the counter if we're in a terminal
-	// and not let's say piping into a file
-	if terminal.IsTerminal(int(os.Stdout.Fd())) {
-		i := 0
-		for {
-			i++
-			fmt.Printf("\033[2K\rWaiting for block: %02dsec", i)
-			//fmt.Println(i)
-			time.Sleep(1 * time.Second)
-		}
+func commitHash(hash string, owner string) {
+	reader, err := firstFile(WalletDirectory())
+	if err != nil {
+		log.Fatal(err)
 	}
+	fmt.Print("Password:")
+	password, err := terminal.ReadPassword(int(syscall.Stdin))
+	fmt.Println(".")
+	if err != nil {
+		log.Fatal(err)
+	}
+	transactor, err := bind.NewTransactor(reader, string(password))
+	if err != nil {
+		log.Fatal(err)
+	}
+	transactor.GasLimit = GasLimit()
+	transactor.GasPrice = GasPrice()
+	client, err := ethclient.Dial(MainNetEndpoint())
+	if err != nil {
+		log.Fatal(err)
+	}
+	address := common.HexToAddress(ProofContractAddress())
+	instance, err := NewProof(address, client)
+	if err != nil {
+		log.Fatal(err)
+	}
+	tx, err := instance.Set(transactor, owner, hash)
+	if err != nil {
+		log.Fatal(err)
+	}
+	timeout, err := waitForTx(tx.Hash(), TxVerificationRounds(), PollInterval())
+	if err != nil {
+		log.Fatal(err)
+	}
+	if timeout {
+		log.Fatal("transaction timed out")
+	}
+}
+
+func waitForTx(tx common.Hash, maxRounds uint64, pollInterval time.Duration) (timeout bool, err error) {
+	client, err := ethclient.Dial(MainNetEndpoint())
+	if err != nil {
+		return false, err
+	}
+	for i := uint64(0); i < maxRounds; i++ {
+		_, pending, err := client.TransactionByHash(context.Background(), tx)
+		if err != nil {
+			return false, err
+		}
+		if !pending {
+			return false, nil
+		}
+		time.Sleep(pollInterval)
+	}
+	return true, nil
 }
