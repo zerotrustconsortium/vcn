@@ -58,7 +58,7 @@ func main() {
 			Aliases:  []string{"i"},
 			Usage:    "Initialize your working directory.",
 			Action: func(c *cli.Context) error {
-				createKs()
+				CreateKeystore()
 				return nil
 			},
 			Flags: []cli.Flag{

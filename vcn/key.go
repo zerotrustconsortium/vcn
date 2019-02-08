@@ -17,7 +17,7 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 )
 
-func createKs() {
+func CreateKeystore() {
 	ks := keystore.NewKeyStore(WalletDirectory(), keystore.StandardScryptN, keystore.StandardScryptP)
 	fmt.Print("Keystore password:")
 	bytePassword, err := terminal.ReadPassword(int(syscall.Stdin))
