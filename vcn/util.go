@@ -17,3 +17,12 @@ func firstFile(dir string) (io.Reader, error) {
 	}
 	return nil, fmt.Errorf("empty directory: %s", dir)
 }
+
+func contains(xs []string, x string) bool {
+	for _, a := range xs {
+		if a == x {
+			return true
+		}
+	}
+	return false
+}
