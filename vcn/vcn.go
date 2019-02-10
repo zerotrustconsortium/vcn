@@ -11,6 +11,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -35,6 +36,9 @@ func main() {
 			Aliases:  []string{"v"},
 			Usage:    "Verify against blockchain",
 			Action: func(c *cli.Context) error {
+				if c.NArg() == 0 {
+					return fmt.Errorf("filenames required")
+				}
 				VerifyAll(c.Args())
 				return nil
 			},
@@ -48,6 +52,9 @@ func main() {
 			Aliases:  []string{"c"},
 			Usage:    "Commit in blockchain",
 			Action: func(c *cli.Context) error {
+				if c.NArg() == 0 {
+					return fmt.Errorf("filename required")
+				}
 				Commit(c.Args().First(), "me")
 				return nil
 			},
@@ -58,7 +65,39 @@ func main() {
 			Aliases:  []string{"i"},
 			Usage:    "Initialize your working directory.",
 			Action: func(c *cli.Context) error {
-				CreateKeystore()
+				CreateKeystore("")
+				return nil
+			},
+			Flags: []cli.Flag{
+				cli.BoolFlag{Name: "hash"},
+			},
+		},
+		{
+			Category: "Authenticate",
+			Name:     "auth",
+			Aliases:  []string{"a"},
+			Usage:    "Authenticate against vChain.us.",
+			Action: func(c *cli.Context) error {
+				if c.NArg() == 0 {
+					return fmt.Errorf("email required")
+				}
+				Authenticate(c.Args().First())
+				return nil
+			},
+			Flags: []cli.Flag{
+				cli.BoolFlag{Name: "hash"},
+			},
+		},
+		{
+			Category: "Register",
+			Name:     "register",
+			Aliases:  []string{"r"},
+			Usage:    "Register an account on the vChain.us platform.",
+			Action: func(c *cli.Context) error {
+				if c.NArg() == 0 {
+					return fmt.Errorf("email required")
+				}
+				Register(c.Args().First())
 				return nil
 			},
 			Flags: []cli.Flag{
