@@ -17,7 +17,19 @@ import (
 )
 
 func MainNetEndpoint() string {
-	return "https://main.vchain.us"
+	return "https://main.staging.vchain.us"
+}
+
+func FoundationEndpoint() string {
+	return "https://api.staging.vchain.us/foundation"
+}
+
+func PublisherEndpoint() string {
+	return FoundationEndpoint() + "/v1/publisher"
+}
+
+func WalletEndpoint() string {
+	return FoundationEndpoint() + "/v1/wallet"
 }
 
 func ProofContractAddress() string {
@@ -38,6 +50,10 @@ func VcnDirectory() string {
 
 func WalletDirectory() string {
 	return VcnDirectory() + "/wallets"
+}
+
+func TokenFile() string {
+	return VcnDirectory() + "/t"
 }
 
 func GasPrice() *big.Int {
