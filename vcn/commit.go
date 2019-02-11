@@ -37,7 +37,7 @@ func commitHash(hash string, owner string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Print("Password:")
+	fmt.Print("Keystore passphrase:")
 	password, err := terminal.ReadPassword(int(syscall.Stdin))
 	fmt.Println(".")
 	if err != nil {
