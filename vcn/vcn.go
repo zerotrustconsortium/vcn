@@ -48,8 +48,8 @@ func main() {
 		},
 		{
 			Category: "Artifact actions",
-			Name:     "commit",
-			Aliases:  []string{"c"},
+			Name:     "sign",
+			Aliases:  []string{"s"},
 			Usage:    "Commit in blockchain",
 			Action: func(c *cli.Context) error {
 				if c.NArg() == 0 {
