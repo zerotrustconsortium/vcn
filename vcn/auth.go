@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 	"syscall"
 	"time"
 
@@ -29,17 +31,23 @@ type Error struct {
 	Error     string `json:"error"`
 }
 
-func Authenticate(email string) {
+func Authenticate() {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print("Please enter your email address: ")
+	email, _ := reader.ReadString('\n')
+	email = strings.TrimSuffix(email, "\n")
+
 	token := new(TokenResponse)
 	authError := new(Error)
 	fmt.Print("Password:")
 	password, err := terminal.ReadPassword(int(syscall.Stdin))
 	fmt.Println(".")
+
 	if err != nil {
 		log.Fatal(err)
 	}
 	r, err := sling.New().
-		Post(PublisherEndpoint() + "/auth").
+		Post(PublisherEndpoint()+"/auth").
 		BodyJSON(AuthRequest{Email: email, Password: string(password)}).
 		Receive(token, authError)
 	if err != nil {
@@ -54,15 +62,53 @@ func Authenticate(email string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	fmt.Println("Authentication successful.")
+
+	// check for a keystore right now and hint at creating one
+	createKeystoreForDashboardUsers()
+
 }
 
-func Register(email string) {
+func createKeystoreForDashboardUsers() {
+	// this is for the case of a newly registered customer
+	// coming in from the dashboard
+	// having authenticatedat vcn and no keystore is yet present
+	hasKeystore, err := HasKeystore()
+	if err != nil {
+		log.Fatal(err)
+	}
+	if hasKeystore == false {
+		fmt.Println("You have no keystore set up yet. <vcn> will now do this for you and upload the public key to the platform.")
+
+		keystorePassphrase, err := readPassword("Keystore passphrase:")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		CreateKeystore(keystorePassphrase)
+		SyncKeys()
+
+	}
+
+}
+
+func Register() {
 	var keystorePassphrase string
 	authError := new(Error)
 	hasKeystore, err := HasKeystore()
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// get email
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Println("User registration for vChain.us: New account")
+	fmt.Println("If you already have an account pls abort and simply authenticate yourself using <vcn auth>")
+	fmt.Print("Please enter your email address: ")
+	email, _ := reader.ReadString('\n')
+	email = strings.TrimSuffix(email, "\n")
+
 	accountPassword, err := readPassword("Account password:")
 	if err != nil {
 		log.Fatal(err)
@@ -106,7 +152,7 @@ func WaitForConfirmation(email string, password string, maxRounds uint64,
 	authError := new(Error)
 	for i := uint64(0); i < maxRounds; i++ {
 		r, err := sling.New().
-			Post(PublisherEndpoint() + "/auth").
+			Post(PublisherEndpoint()+"/auth").
 			BodyJSON(AuthRequest{Email: email, Password: password}).
 			Receive(token, authError)
 		if err != nil {

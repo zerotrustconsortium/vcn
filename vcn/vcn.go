@@ -61,27 +61,12 @@ func main() {
 		},
 		{
 			Category: "User actions",
-			Name:     "init",
-			Aliases:  []string{"i"},
-			Usage:    "Initialize your working directory.",
-			Action: func(c *cli.Context) error {
-				CreateKeystore("")
-				return nil
-			},
-			Flags: []cli.Flag{
-				cli.BoolFlag{Name: "hash"},
-			},
-		},
-		{
-			Category: "Authenticate",
 			Name:     "auth",
 			Aliases:  []string{"a"},
 			Usage:    "Authenticate against vChain.us.",
 			Action: func(c *cli.Context) error {
-				if c.NArg() == 0 {
-					return fmt.Errorf("email required")
-				}
-				Authenticate(c.Args().First())
+
+				Authenticate()
 				return nil
 			},
 			Flags: []cli.Flag{
@@ -89,15 +74,13 @@ func main() {
 			},
 		},
 		{
-			Category: "Register",
+			Category: "User actions",
 			Name:     "register",
 			Aliases:  []string{"r"},
 			Usage:    "Register an account on the vChain.us platform.",
 			Action: func(c *cli.Context) error {
-				if c.NArg() == 0 {
-					return fmt.Errorf("email required")
-				}
-				Register(c.Args().First())
+
+				Register()
 				return nil
 			},
 			Flags: []cli.Flag{
