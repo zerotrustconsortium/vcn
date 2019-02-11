@@ -57,16 +57,25 @@ func Authenticate(email string) {
 }
 
 func Register(email string) {
+	var keystorePassphrase string
 	authError := new(Error)
-	fmt.Print("Password:")
-	password, err := terminal.ReadPassword(int(syscall.Stdin))
-	fmt.Println(".")
+	hasKeystore, err := HasKeystore()
 	if err != nil {
 		log.Fatal(err)
 	}
+	accountPassword, err := readPassword("Account password:")
+	if err != nil {
+		log.Fatal(err)
+	}
+	if !hasKeystore {
+		keystorePassphrase, err = readPassword("Keystore passphrase:")
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 	r, err := sling.New().
 		Post(PublisherEndpoint()).
-		BodyJSON(AuthRequest{Email: email, Password: string(password)}).
+		BodyJSON(AuthRequest{Email: email, Password: accountPassword}).
 		Receive(nil, authError)
 	if err != nil {
 		log.Fatal(err)
@@ -77,14 +86,18 @@ func Register(email string) {
 	}
 	log.Println("We've sent you an email to: ", email,
 		"Click the link and you will be automatically logged in")
-	err = WaitForConfirmation(email, string(password),
-		60, 2*time.Second)
-	if err != nil {
-		log.Fatal(err)
+	if hasKeystore {
+		SyncKeys()
+		return
+	} else {
+		CreateKeystore(keystorePassphrase)
+		err = WaitForConfirmation(email, accountPassword,
+			60, 2*time.Second)
+		if err != nil {
+			log.Fatal(err)
+		}
+		SyncKeys()
 	}
-	// @ameingast: check for existing key-stores
-	CreateKeystore(string(password))
-	SyncKeys()
 }
 
 func WaitForConfirmation(email string, password string, maxRounds uint64,

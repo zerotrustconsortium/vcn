@@ -13,11 +13,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"syscall"
 
 	"github.com/dghubble/sling"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
-	"golang.org/x/crypto/ssh/terminal"
 )
 
 type Wallet struct {
@@ -26,22 +24,28 @@ type Wallet struct {
 }
 
 func CreateKeystore(password string) {
-	ks := keystore.NewKeyStore(WalletDirectory(), keystore.StandardScryptN, keystore.StandardScryptP)
-	fmt.Print("Keystore password:")
 	if password == "" {
-		bytePassword, err := terminal.ReadPassword(int(syscall.Stdin))
+		var err error
+		password, err = readPassword("Keystore passphrase:")
 		if err != nil {
 			log.Fatal(err)
 		}
-		password = string(bytePassword)
 	}
-	fmt.Println(".")
+	ks := keystore.NewKeyStore(WalletDirectory(), keystore.StandardScryptN, keystore.StandardScryptP)
 	account, err := ks.NewAccount(password)
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println("Public key:\t", account.Address.Hex())
 	fmt.Println("Keystore:\t", WalletDirectory())
+}
+
+func HasKeystore() (bool, error) {
+	files, err := ioutil.ReadDir(WalletDirectory())
+	if err != nil {
+		return false, err
+	}
+	return len(files) > 0, nil
 }
 
 func LoadPublicKeys() (addresses []string, err error) {

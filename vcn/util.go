@@ -4,7 +4,11 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
+	"syscall"
+
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 func firstFile(dir string) (io.Reader, error) {
@@ -25,4 +29,21 @@ func contains(xs []string, x string) bool {
 		}
 	}
 	return false
+}
+
+func readPassword(msg string) (string, error) {
+	fmt.Print(msg)
+	password, err := terminal.ReadPassword(int(syscall.Stdin))
+	fmt.Println(".")
+	if err != nil {
+		return "", err
+	}
+	return string(password), nil
+}
+
+func createDirectoryInfrastructure() {
+	err := os.MkdirAll(WalletDirectory(), os.FileMode(0700))
+	if err != nil {
+		log.Fatal(err)
+	}
 }

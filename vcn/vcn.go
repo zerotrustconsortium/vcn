@@ -106,6 +106,7 @@ func main() {
 		},
 	}
 
+	createDirectoryInfrastructure()
 	err := app.Run(os.Args)
 	if err != nil {
 		log.Fatal(err)
