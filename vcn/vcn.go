@@ -21,7 +21,8 @@ import (
 func main() {
 	app := cli.NewApp()
 	app.Name = "vcn"
-	app.Version = "0.0.1"
+	app.Usage = "code signing made easy"
+	app.Version = "0.1.1"
 
 	app.Commands = []cli.Command{
 		// possible commands:
@@ -34,7 +35,7 @@ func main() {
 			Category: "Artifact actions",
 			Name:     "verify",
 			Aliases:  []string{"v"},
-			Usage:    "Verify against blockchain",
+			Usage:    "Verify digital artifact against blockchain",
 			Action: func(c *cli.Context) error {
 				if c.NArg() == 0 {
 					return fmt.Errorf("filenames required")
@@ -50,7 +51,7 @@ func main() {
 			Category: "Artifact actions",
 			Name:     "sign",
 			Aliases:  []string{"s"},
-			Usage:    "Commit in blockchain",
+			Usage:    "Sign commits and artifact's hash onto the blockchain",
 			Action: func(c *cli.Context) error {
 				if c.NArg() == 0 {
 					return fmt.Errorf("filename required")
@@ -63,7 +64,7 @@ func main() {
 			Category: "User actions",
 			Name:     "auth",
 			Aliases:  []string{"a"},
-			Usage:    "Authenticate against vChain.us.",
+			Usage:    "Authenticate with dashboard at vChain.us",
 			Action: func(c *cli.Context) error {
 
 				auth()
@@ -77,7 +78,7 @@ func main() {
 			Category: "User actions",
 			Name:     "dashboard",
 			Aliases:  []string{"d"},
-			Usage:    "Browse to vChain.us.",
+			Usage:    "Open dashboard at vChain.us in browser",
 			Action: func(c *cli.Context) error {
 
 				dashboard()
@@ -88,7 +89,7 @@ func main() {
 			Category: "User actions",
 			Name:     "register",
 			Aliases:  []string{"r"},
-			Usage:    "Register an account on the vChain.us platform.",
+			Usage:    "Register an account with vChain.us",
 			Action: func(c *cli.Context) error {
 
 				Register()
