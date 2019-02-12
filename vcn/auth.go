@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/dghubble/sling"
-	"github.com/pkg/browser"
+
 	"golang.org/x/crypto/ssh/terminal"
 )
 
@@ -94,12 +94,6 @@ func createKeystoreForDashboardUsers() {
 
 }
 
-func dashboard() {
-	// open dashboard
-	// shall the locally stored token be used + vcn auth unless existing
-	// or shall we use the login on web?
-	browser.OpenURL(DashboardURL())
-}
 func Register() {
 	var keystorePassphrase string
 	authError := new(Error)
