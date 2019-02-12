@@ -75,6 +75,17 @@ func main() {
 		},
 		{
 			Category: "User actions",
+			Name:     "dashboard",
+			Aliases:  []string{"d"},
+			Usage:    "Browse to vChain.us.",
+			Action: func(c *cli.Context) error {
+
+				dashboard()
+				return nil
+			},
+		},
+		{
+			Category: "User actions",
 			Name:     "register",
 			Aliases:  []string{"r"},
 			Usage:    "Register an account on the vChain.us platform.",

@@ -16,6 +16,9 @@ import (
 	"time"
 )
 
+func DashboardURL() string {
+	return "https://dashboard.staging.vchain.us"
+}
 func MainNetEndpoint() string {
 	return "https://main.staging.vchain.us"
 }
