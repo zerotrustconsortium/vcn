@@ -66,7 +66,7 @@ func main() {
 			Usage:    "Authenticate against vChain.us.",
 			Action: func(c *cli.Context) error {
 
-				Authenticate()
+				auth()
 				return nil
 			},
 			Flags: []cli.Flag{

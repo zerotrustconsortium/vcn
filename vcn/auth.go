@@ -7,12 +7,9 @@ import (
 	"log"
 	"os"
 	"strings"
-	"syscall"
 	"time"
 
 	"github.com/dghubble/sling"
-
-	"golang.org/x/crypto/ssh/terminal"
 )
 
 type AuthRequest struct {
@@ -32,24 +29,14 @@ type Error struct {
 	Error     string `json:"error"`
 }
 
-func Authenticate() {
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("Please enter your email address: ")
-	email, _ := reader.ReadString('\n')
-	email = strings.TrimSuffix(email, "\n")
+func Authenticate(email string, password string) (ret bool) {
 
 	token := new(TokenResponse)
 	authError := new(Error)
-	fmt.Print("Password:")
-	password, err := terminal.ReadPassword(int(syscall.Stdin))
-	fmt.Println(".")
 
-	if err != nil {
-		log.Fatal(err)
-	}
 	r, err := sling.New().
 		Post(PublisherEndpoint()+"/auth").
-		BodyJSON(AuthRequest{Email: email, Password: string(password)}).
+		BodyJSON(AuthRequest{Email: email, Password: password}).
 		Receive(token, authError)
 	if err != nil {
 		log.Fatal(err)
@@ -64,33 +51,7 @@ func Authenticate() {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Authentication successful.")
-
-	// check for a keystore right now and hint at creating one
-	createKeystoreForDashboardUsers()
-
-}
-
-func createKeystoreForDashboardUsers() {
-	// this is for the case of a newly registered customer
-	// coming in from the dashboard
-	// having authenticatedat vcn and no keystore is yet present
-	hasKeystore, err := HasKeystore()
-	if err != nil {
-		log.Fatal(err)
-	}
-	if hasKeystore == false {
-		fmt.Println("You have no keystore set up yet. <vcn> will now do this for you and upload the public key to the platform.")
-
-		keystorePassphrase, err := readPassword("Keystore passphrase:")
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		CreateKeystore(keystorePassphrase)
-		SyncKeys()
-
-	}
+	return true
 
 }
 
