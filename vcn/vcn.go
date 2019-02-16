@@ -56,7 +56,7 @@ func main() {
 				if c.NArg() == 0 {
 					return fmt.Errorf("filename required")
 				}
-				Commit(c.Args().First(), "me")
+				Sign(c.Args().First(), "me")
 				return nil
 			},
 		},

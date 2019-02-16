@@ -11,45 +11,11 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"os"
-	"strings"
-	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/fatih/color"
 )
-
-func VerifyAll(files []string) {
-	for _, file := range files {
-		Verify(file)
-	}
-}
-
-func Verify(filename string) {
-	hash := strings.TrimSpace(hash(filename))
-	verified, owner, timestamp := verifyHash(hash)
-	fmt.Println("File:\t", filename)
-	fmt.Println("Hash:\t", hash)
-	if timestamp != 0 {
-		fmt.Println("Date:\t", time.Unix(timestamp, 0))
-	}
-	if owner != "" {
-		fmt.Println("Signer:\t", owner)
-	}
-	if verified {
-		color.Set(color.FgHiWhite, color.BgCyan, color.Bold)
-		fmt.Print("VERIFIED")
-	} else {
-		color.Set(color.FgHiWhite, color.BgMagenta, color.Bold)
-		fmt.Print("UNKNOWN")
-		defer os.Exit(1)
-	}
-	color.Unset()
-	fmt.Println()
-}
 
 func verifyHash(hash string) (verified bool, owner string, timestamp int64) {
 	client, err := ethclient.Dial(MainNetEndpoint())

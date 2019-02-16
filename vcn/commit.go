@@ -12,38 +12,20 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
-	"syscall"
 	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"golang.org/x/crypto/ssh/terminal"
 )
 
-func Commit(filename string, owner string) {
-	hash := hash(filename)
-	commitHash(hash, owner)
-	fmt.Println("File:\t", filename)
-	fmt.Println("Hash:\t", hash)
-	fmt.Println("Date:\t", time.Now())
-	fmt.Println("Signer:\t", owner)
-}
-
-func commitHash(hash string, owner string) {
+func commitHash(hash string, owner string, passphrase string) {
 	reader, err := firstFile(WalletDirectory())
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Print("Keystore passphrase:")
-	password, err := terminal.ReadPassword(int(syscall.Stdin))
-	fmt.Println(".")
-	if err != nil {
-		log.Fatal(err)
-	}
-	transactor, err := bind.NewTransactor(reader, string(password))
+	transactor, err := bind.NewTransactor(reader, passphrase)
 	if err != nil {
 		log.Fatal(err)
 	}
