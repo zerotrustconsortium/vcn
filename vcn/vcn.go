@@ -61,6 +61,20 @@ func main() {
 			},
 		},
 		{
+			Category: "Artifact actions",
+			Name:     "list",
+			Aliases:  []string{"l"},
+			Usage:    "List your signed artifacts",
+			Action: func(c *cli.Context) error {
+				artifacts, err := LoadArtifactsForCurrentWallet()
+				if err != nil {
+					log.Fatal(err)
+				}
+				fmt.Println("Artifacts: ", artifacts)
+				return nil
+			},
+		},
+		{
 			Category: "User actions",
 			Name:     "auth",
 			Aliases:  []string{"a"},

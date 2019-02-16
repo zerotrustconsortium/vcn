@@ -12,12 +12,15 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"syscall"
 	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 func commitHash(hash string, owner string, passphrase string) {
@@ -50,6 +53,14 @@ func commitHash(hash string, owner string, passphrase string) {
 	}
 	if timeout {
 		log.Fatal("transaction timed out")
+	}
+	publicKey, err := PublicKeyForLocalWallet()
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = CreateArtifact(publicKey, name, hash)
+	if err != nil {
+		log.Fatal(err)
 	}
 }
 

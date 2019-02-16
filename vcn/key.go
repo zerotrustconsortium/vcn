@@ -23,6 +23,10 @@ type Wallet struct {
 	Address string `json:"address"`
 }
 
+type PagedWalletResponse struct {
+	Content []Wallet `json:"content"`
+}
+
 func CreateKeystore(password string) {
 	if password == "" {
 		var err error
@@ -50,7 +54,7 @@ func HasKeystore() (bool, error) {
 
 func LoadPublicKeys() (addresses []string, err error) {
 	authError := new(Error)
-	wallets := new([]Wallet)
+	pagedWalletResponse := new(PagedWalletResponse)
 	token, err := LoadToken()
 	if err != nil {
 		log.Fatal(err)
@@ -58,7 +62,7 @@ func LoadPublicKeys() (addresses []string, err error) {
 	r, err := sling.New().
 		Add("Authorization", "Bearer "+token).
 		Get(WalletEndpoint()).
-		Receive(wallets, authError)
+		Receive(pagedWalletResponse, authError)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -67,7 +71,7 @@ func LoadPublicKeys() (addresses []string, err error) {
 			authError.Status)
 	}
 	var result []string
-	for _, wallet := range *wallets {
+	for _, wallet := range (*pagedWalletResponse).Content {
 		result = append(result, wallet.Address)
 	}
 	return result, nil
@@ -83,25 +87,10 @@ func SyncKeys() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	reader, err := firstFile(WalletDirectory())
+	localAddress, err := PublicKeyForLocalWallet()
 	if err != nil {
 		log.Fatal(err)
 	}
-	contents, err := ioutil.ReadAll(reader)
-	if err != nil {
-		log.Fatal(err)
-	}
-	var keyfile map[string]*json.RawMessage
-	err = json.Unmarshal(contents, &keyfile)
-	if err != nil {
-		log.Fatal(err)
-	}
-	var localAddress string
-	err = json.Unmarshal(*keyfile["address"], &localAddress)
-	if err != nil {
-		log.Fatal(err)
-	}
-	localAddress = "0x" + localAddress
 	if contains(addresses, localAddress) {
 		return
 	}
@@ -117,4 +106,26 @@ func SyncKeys() {
 		log.Fatalf("request failed: %s (%d)", authError.Message,
 			authError.Status)
 	}
+}
+
+func PublicKeyForLocalWallet() (string, error) {
+	reader, err := firstFile(WalletDirectory())
+	if err != nil {
+		return "", err
+	}
+	contents, err := ioutil.ReadAll(reader)
+	if err != nil {
+		return "", err
+	}
+	var keyfile map[string]*json.RawMessage
+	err = json.Unmarshal(contents, &keyfile)
+	if err != nil {
+		return "", err
+	}
+	var localAddress string
+	err = json.Unmarshal(*keyfile["address"], &localAddress)
+	if err != nil {
+		return "", err
+	}
+	return "0x" + localAddress, nil
 }

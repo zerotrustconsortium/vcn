@@ -81,6 +81,8 @@ func auth() {
 		CreateKeystore(keystorePassphrase)
 		SyncKeys()
 
+	} else {
+		SyncKeys()
 	}
 
 }

@@ -1,0 +1,83 @@
+package main
+
+import (
+	"fmt"
+	"log"
+
+	"github.com/dghubble/sling"
+)
+
+type ArtifactRequest struct {
+	Name string `json:"name"`
+	Hash string `json:"hash"`
+}
+
+type PagedArtifactResponse struct {
+	Content []ArtifactResponse `json:"content"`
+}
+
+type ArtifactResponse struct {
+	Name            string   `json:"name"`
+	Hash            string   `json:"hash"`
+	Level           int      `json:"level"`
+	Visibility      string   `json:"visibility"`
+	Status          string   `json:"status"`
+	IntegrityChecks []string `json:"integrityChecks"`
+}
+
+func (a ArtifactResponse) String() string {
+	return fmt.Sprintf("(Name: %s, Hash: %s, Level: %d, Visibility: %s, Status: %s, IntegrityChecks: %s)",
+		a.Name, a.Hash, a.Level, a.Visibility, a.Status, a.IntegrityChecks)
+}
+
+func CreateArtifact(walletAddress string, name string, hash string) error {
+	restError := new(Error)
+	token, err := LoadToken()
+	if err != nil {
+		log.Fatal(err)
+	}
+	r, err := sling.New().
+		Post(ArtifactEndpoint(walletAddress)).
+		Add("Authorization", "Bearer "+token).
+		BodyJSON(ArtifactRequest{
+			Name: name,
+			Hash: hash,
+		}).Receive(nil, restError)
+	if err != nil {
+		return err
+	}
+	if r.StatusCode != 200 {
+		return fmt.Errorf("request failed: %s (%d)", restError.Message,
+			restError.Status)
+	}
+	return nil
+}
+
+func LoadArtifactsForCurrentWallet() ([]ArtifactResponse, error) {
+	publicKey, err := PublicKeyForLocalWallet()
+	if err != nil {
+		return nil, err
+	}
+	return LoadArtifacts(publicKey)
+}
+
+func LoadArtifacts(walletAddress string) ([]ArtifactResponse, error) {
+	response := new(PagedArtifactResponse)
+	restError := new(Error)
+	token, err := LoadToken()
+	if err != nil {
+		log.Fatal(err)
+	}
+	r, err := sling.New().
+		Get(ArtifactEndpoint(walletAddress)).
+		Add("Authorization", "Bearer "+token).
+		Receive(&response, restError)
+	if err != nil {
+		return nil, err
+	}
+	if r.StatusCode != 200 {
+		return nil, fmt.Errorf("request failed: %s (%d)",
+			restError.Message, restError.Status)
+	}
+	return response.Content, nil
+}

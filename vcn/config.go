@@ -35,6 +35,10 @@ func WalletEndpoint() string {
 	return FoundationEndpoint() + "/v1/wallet"
 }
 
+func ArtifactEndpoint(walletAddress string) string {
+	return FoundationEndpoint() + "/v1/artifact?wallet-address=" + walletAddress
+}
+
 func ProofContractAddress() string {
 	return "0x66ccf074254cb0eb8d9e8020d8e777406a1d9cbb"
 }
