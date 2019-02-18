@@ -22,7 +22,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "vcn"
 	app.Usage = "code signing made easy"
-	app.Version = "0.1.1"
+	app.Version = "0.1.2"
 
 	app.Commands = []cli.Command{
 		// possible commands:
