@@ -122,7 +122,7 @@ func Sign(filename string, owner string) {
 	go displayLatency()
 
 	// TODO: return and display: block #, trx #
-	commitHash(hash, owner, string(passphrase))
+	commitHash(hash, owner, string(passphrase), filename)
 	fmt.Println("")
 	fmt.Println("File:\t", filename)
 	fmt.Println("Hash:\t", hash)
@@ -167,7 +167,7 @@ func displayLatency() {
 	for {
 		i++
 		fmt.Printf("\033[2K\rIn progress %02dsec", i)
-		//fmt.Println(i)
+		// fmt.Println(i)
 		time.Sleep(1 * time.Second)
 	}
 }
