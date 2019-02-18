@@ -70,7 +70,7 @@ func main() {
 				if err != nil {
 					log.Fatal(err)
 				}
-				fmt.Println("Artifacts: ", artifacts)
+				fmt.Println("Artifacts:\n", artifacts)
 				return nil
 			},
 		},

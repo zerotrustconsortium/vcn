@@ -26,8 +26,9 @@ type ArtifactResponse struct {
 }
 
 func (a ArtifactResponse) String() string {
-	return fmt.Sprintf("(Name: %s, Hash: %s, Level: %d, Visibility: %s, Status: %s, IntegrityChecks: %s)",
-		a.Name, a.Hash, a.Level, a.Visibility, a.Status, a.IntegrityChecks)
+
+	return fmt.Sprintf("File:\t%s\nHash:\t%s\nStatus:\t%s\n\n",
+		a.Name, a.Hash, a.Status)
 }
 
 func CreateArtifact(walletAddress string, name string, hash string) error {

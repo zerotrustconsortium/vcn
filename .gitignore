@@ -15,7 +15,7 @@
 .DS_Store
 
 # Compiled binaries
-vcn/vcn
+dist/vcn-*
 
 # IntelliJ
 *.iml
