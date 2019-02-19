@@ -6,6 +6,12 @@ Global, de-centralized signing of code and other digital assets
 
 This software is released under [GPL3](https://www.gnu.org/licenses/gpl-3.0.en.html).
 
+## Installation
+
+It's easiest to download the lates release from GitHub:
+
+https://github.com/vchain-us/vcn/releases
+
 ## Installation from Source
 
 After having installed [golang](https://golang.org/doc/install) clone this 
