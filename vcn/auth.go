@@ -76,7 +76,7 @@ func Register() {
 	fmt.Println("If you already have an account pls abort and simply authenticate yourself using <vcn auth>")
 	fmt.Print("Please enter your email address: ")
 	email, _ := reader.ReadString('\n')
-	email = strings.TrimSuffix(email, "\n")
+	email = strings.TrimSpace(email)
 
 	accountPassword, err := readPassword("Account password:")
 	if err != nil {
