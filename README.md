@@ -4,7 +4,7 @@ Global, de-centralized signing of code and other digital assets
 
 ## License
 
-This software is released under GPL3.
+This software is released under [GPL3](https://www.gnu.org/licenses/gpl-3.0.en.html).
 
 ## Installation from Source
 
