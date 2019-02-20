@@ -94,15 +94,14 @@ func Sign(filename string, owner string) {
 	reader := bufio.NewReader(os.Stdin)
 
 	fmt.Println()
-	fmt.Println("vChain CodeNotary - code signing made easy:")
-	fmt.Println("Attention, by signing this artifact you implicitly claim its ownerhsip.")
-	fmt.Println("Doing this can potentially infringe other publisher's intellectual property under the laws of your country of residence.")
-	fmt.Println("vChain, CodeNotary and the ZTC cannot be held responsible for legal ramifications.")
-	fmt.Println()
+	fmt.Println("vChain CodeNotary - code signing made easy:\n")
+	fmt.Println("Attention, by signing this artifact you implicitly claim its ownership.")
+	fmt.Println("Doing this can potentially infringe other publisher's intellectual\nproperty under the laws of your country of residence.\n")
+	fmt.Println("vChain, CodeNotary and the Zero Trust Consortium cannot be\nheld responsible for legal ramifications.\n\n")
 	color.Set(color.FgGreen)
-	fmt.Println("It's safe to continue if you are the owner of the artifact, e.g. author, creator, publisher.")
+	fmt.Println("It's safe to continue if you are the owner of the artif,\ne.g. author, creator, publisher.")
 	color.Unset()
-	fmt.Print("Do you understand and want to continue? (y/N):")
+	fmt.Print("\nDo you understand and want to continue? (y/N):")
 
 	question, _ := reader.ReadString('\n')
 
