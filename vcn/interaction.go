@@ -27,6 +27,77 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 )
 
+func register() {
+
+	var keystorePassphrase string
+
+	hasKeystore, err := HasKeystore()
+	if err != nil {
+		log.Fatal(err)
+	}
+	if hasKeystore {
+		// for now, we only enable ONE keystore
+		fmt.Printf("You already have a keystore.\n")
+		PrintErrorURLCustom("keystore", 428)
+		os.Exit(1)
+	}
+
+	fmt.Println("User registration for vChain.us\n" +
+		"If you already have an account abort and\n" +
+		"authenticate yourself using <vcn auth>")
+
+	email, accountPassword, _ := getLoginCredentials()
+
+	Register(email, accountPassword)
+
+	if !hasKeystore {
+		keystorePassphrase, err = readPassword("Keystore passphrase:")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		pubKey, wallet := CreateKeystore(keystorePassphrase)
+
+		fmt.Println("Keystore successfully created")
+		fmt.Println("Public key:\t", pubKey)
+		fmt.Println("Keystore:\t", wallet)
+
+		fmt.Println("We've sent you an email to: ", email,
+			"\nClick the link and you will be automatically logged in.")
+		color.Set(StyleAffordance())
+		fmt.Print("Check your email [...]")
+		color.Unset()
+		fmt.Println()
+
+		err = WaitForConfirmation(email, accountPassword,
+			60, 2*time.Second)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	SyncKeys()
+}
+
+func getLoginCredentials() (email string, passwordString string, err error) {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print("Email address: ")
+	email, _ = reader.ReadString('\n')
+	email = strings.TrimSuffix(email, "\n")
+
+	fmt.Print("Password: ")
+	password, err := terminal.ReadPassword(int(syscall.Stdin))
+	passwordString = string(password)
+
+	fmt.Println("")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return email, passwordString, nil
+}
+
 func dashboard() {
 	// open dashboard
 	// we intentionally do not read the customer's token from disk
@@ -94,10 +165,18 @@ func Sign(filename string, owner string) {
 	reader := bufio.NewReader(os.Stdin)
 
 	fmt.Println()
-	fmt.Println("vChain CodeNotary - code signing made easy:\n")
-	fmt.Println("Attention, by signing this artifact you implicitly claim its ownership.")
-	fmt.Println("Doing this can potentially infringe other publisher's intellectual\nproperty under the laws of your country of residence.\n")
-	fmt.Println("vChain, CodeNotary and the Zero Trust Consortium cannot be\nheld responsible for legal ramifications.\n\n")
+
+	output := "" +
+		"vChain CodeNotary - code signing made easy:\n" +
+		"-------------------------------------------\n" +
+		"Attention, by signing this artifact you implicitly claim its ownership.\n" +
+		"Doing this can potentially infringe other publisher's intellectual\n" +
+		"property under the laws of your country of residence.\n" +
+		"vChain, CodeNotary and the Zero Trust Consortium cannot be\n" +
+		"held responsible for legal ramifications.\n\n"
+
+	fmt.Println(output)
+
 	color.Set(color.FgGreen)
 	fmt.Println("It's safe to continue if you are the owner of the artif,\ne.g. author, creator, publisher.")
 	color.Unset()

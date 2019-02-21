@@ -10,7 +10,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 
@@ -27,7 +26,7 @@ type PagedWalletResponse struct {
 	Content []Wallet `json:"content"`
 }
 
-func CreateKeystore(password string) {
+func CreateKeystore(password string) (pubKey string, wallet string) {
 	if password == "" {
 		var err error
 		password, err = readPassword("Keystore passphrase:")
@@ -40,8 +39,11 @@ func CreateKeystore(password string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Public key:\t", account.Address.Hex())
-	fmt.Println("Keystore:\t", WalletDirectory())
+
+	pubKey = account.Address.Hex()
+	wallet = WalletDirectory()
+
+	return pubKey, wallet
 }
 
 func HasKeystore() (bool, error) {

@@ -14,8 +14,19 @@ import (
 	"math/big"
 	"os"
 	"time"
+
+	"github.com/fatih/color"
 )
 
+func StyleAffordance() (color.Attribute, color.Attribute, color.Attribute) {
+	return color.FgHiGreen, color.BgHiWhite, color.Bold
+}
+func StyleError() (color.Attribute, color.Attribute, color.Attribute) {
+	return color.FgHiRed, color.BgHiWhite, color.Bold
+}
+func ErrorWikiURL() string {
+	return "https://github.com/vchain-us/vcn/wiki/Errors#"
+}
 func DashboardURL() string {
 	return "https://dashboard.staging.vchain.us"
 }

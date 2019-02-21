@@ -106,7 +106,7 @@ func main() {
 			Usage:    "Register an account with vChain.us",
 			Action: func(c *cli.Context) error {
 
-				Register()
+				register()
 				return nil
 			},
 			Flags: []cli.Flag{

@@ -8,12 +8,10 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/dghubble/sling"
@@ -62,32 +60,12 @@ func Authenticate(email string, password string) (ret bool) {
 
 }
 
-func Register() {
-	var keystorePassphrase string
+// Register creates an Account with vChain.us
+func Register(email string, accountPassword string) {
+
 	authError := new(Error)
-	hasKeystore, err := HasKeystore()
-	if err != nil {
-		log.Fatal(err)
-	}
+	//var apiError string
 
-	// get email
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Println("User registration for vChain.us: New account")
-	fmt.Println("If you already have an account pls abort and simply authenticate yourself using <vcn auth>")
-	fmt.Print("Please enter your email address: ")
-	email, _ := reader.ReadString('\n')
-	email = strings.TrimSpace(email)
-
-	accountPassword, err := readPassword("Account password:")
-	if err != nil {
-		log.Fatal(err)
-	}
-	if !hasKeystore {
-		keystorePassphrase, err = readPassword("Keystore passphrase:")
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
 	r, err := sling.New().
 		Post(PublisherEndpoint()).
 		BodyJSON(AuthRequest{Email: email, Password: accountPassword}).
@@ -96,22 +74,11 @@ func Register() {
 		log.Fatal(err)
 	}
 	if r.StatusCode != 200 {
-		log.Fatalf("request failed: %s (%d)", authError.Message,
-			authError.Status)
-	}
-	log.Println("We've sent you an email to: ", email,
-		"Click the link and you will be automatically logged in")
-	if hasKeystore {
-		SyncKeys()
-		return
-	} else {
-		CreateKeystore(keystorePassphrase)
-		err = WaitForConfirmation(email, accountPassword,
-			60, 2*time.Second)
-		if err != nil {
-			log.Fatal(err)
-		}
-		SyncKeys()
+		//GET-v1-artifact-404
+
+		log.Printf("request failed: %s (%d)", authError.Message, authError.Status)
+		PrintErrorURLByEndpoint(PublisherEndpoint(), "POST", authError.Status)
+		os.Exit(1)
 	}
 }
 

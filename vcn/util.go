@@ -6,8 +6,10 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 	"syscall"
 
+	"github.com/fatih/color"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
@@ -46,4 +48,50 @@ func createDirectoryInfrastructure() {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+// PrintErrorURLCustom takes custom domain and status code
+func PrintErrorURLCustom(domain string, code int) {
+
+	fmt.Print("Get help for this error at:\n")
+
+	color.Set(StyleError())
+	fmt.Print(formatErrorURLCustom(domain, code))
+	color.Unset()
+
+	fmt.Println()
+	return
+
+}
+func formatErrorURLCustom(domain string, status int) string {
+
+	errorPage := ErrorWikiURL()
+
+	return fmt.Sprintf("%s%s-%d", errorPage, domain, status)
+
+}
+
+// PrintErrorURLByEndpoint takes API errors and creates github wiki links
+func PrintErrorURLByEndpoint(resource string, verb string, status int) {
+
+	fmt.Print("Get help for this error at:\n")
+
+	color.Set(StyleError())
+	fmt.Print(formatErrorURLByEndpoint(resource, verb, status))
+	color.Unset()
+
+	fmt.Println()
+	return
+
+}
+func formatErrorURLByEndpoint(resource string, verb string, status int) string {
+
+	errorPage := ErrorWikiURL()
+
+	// get last part of endpoint
+	x := strings.Split(resource, "/")
+	resource = x[len(x)-1]
+
+	return fmt.Sprintf("%s%s-%s-%d", errorPage, resource, strings.ToLower(verb), status)
+
 }
