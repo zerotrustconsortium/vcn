@@ -12,7 +12,9 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -27,7 +29,10 @@ func commitHash(hash string, owner string, passphrase string, filename string) {
 	}
 	transactor, err := bind.NewTransactor(reader, passphrase)
 	if err != nil {
-		log.Fatal(err)
+		//log.Fatal(err)
+		fmt.Printf("\n%s\n", err.Error())
+		PrintErrorURLCustom("sign", 401)
+		os.Exit(1)
 	}
 	transactor.GasLimit = GasLimit()
 	transactor.GasPrice = GasPrice()

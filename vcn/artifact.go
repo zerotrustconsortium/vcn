@@ -11,6 +11,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/dghubble/sling"
 )
@@ -43,7 +44,9 @@ func CreateArtifact(walletAddress string, name string, hash string) error {
 	restError := new(Error)
 	token, err := LoadToken()
 	if err != nil {
-		log.Fatal(err)
+		fmt.Printf("\n%s\n", err.Error())
+		PrintErrorURLCustom("sign", 404)
+		os.Exit(1)
 	}
 	r, err := sling.New().
 		Post(ArtifactEndpoint(walletAddress)).

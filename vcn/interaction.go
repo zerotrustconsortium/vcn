@@ -31,6 +31,17 @@ func register() {
 
 	var keystorePassphrase string
 
+	// check for token
+	_, err := LoadToken()
+	if err == nil {
+		// if token exists it's wrong!
+		fmt.Println("You already have an account.")
+		fmt.Println("Proceed by authenticating yourself using <vcn auth>")
+		PrintErrorURLCustom("token", 428)
+		os.Exit(1)
+	}
+
+	// keystore
 	hasKeystore, err := HasKeystore()
 	if err != nil {
 		log.Fatal(err)
@@ -42,25 +53,21 @@ func register() {
 		os.Exit(1)
 	}
 
-	fmt.Println("User registration for vChain.us\n" +
-		"If you already have an account abort and\n" +
-		"authenticate yourself using <vcn auth>")
+	fmt.Println("vChain.us User Registration:\n" +
+		"Should you already have an account with vChain.us\n" +
+		"please proceed by authenticating yourself using <vcn auth>")
 
 	email, accountPassword, _ := getLoginCredentials()
 
 	Register(email, accountPassword)
 
 	if !hasKeystore {
-		keystorePassphrase, err = readPassword("Keystore passphrase:")
-		if err != nil {
-			log.Fatal(err)
-		}
+
+		keystorePassphrase = getKeystoreCredentials()
 
 		pubKey, wallet := CreateKeystore(keystorePassphrase)
 
-		fmt.Println("Keystore successfully created")
-		fmt.Println("Public key:\t", pubKey)
-		fmt.Println("Keystore:\t", wallet)
+		printKeystoreDetails(pubKey, wallet)
 
 		fmt.Println("We've sent you an email to: ", email,
 			"\nClick the link and you will be automatically logged in.")
@@ -79,6 +86,19 @@ func register() {
 	SyncKeys()
 }
 
+func printKeystoreDetails(pubKey string, wallet string) {
+	fmt.Println("Keystore successfully created")
+	fmt.Println("Public key:\t", pubKey)
+	fmt.Println("Keystore:\t", wallet)
+}
+func getKeystoreCredentials() (keystorePassphrase string) {
+	fmt.Println("You have no keystore set up yet.")
+	fmt.Println("<vcn> will now do this for you and upload the public key to the platform.")
+
+	keystorePassphrase, _ = readPassword("Keystore passphrase:")
+
+	return string(keystorePassphrase)
+}
 func getLoginCredentials() (email string, passwordString string, err error) {
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Print("Email address: ")
@@ -116,7 +136,7 @@ func auth() {
 	email, _ := reader.ReadString('\n')
 	email = strings.TrimSuffix(email, "\n")
 
-	fmt.Print("     Password: ")
+	fmt.Print("Password: ")
 	password, err := terminal.ReadPassword(int(syscall.Stdin))
 	passwordString := string(password)
 	fmt.Println("")
@@ -141,15 +161,13 @@ func auth() {
 		log.Fatal(err)
 	}
 	if hasKeystore == false {
-		fmt.Println("You have no keystore set up yet.")
-		fmt.Println("<vcn> will now do this for you and upload the public key to the platform.")
 
-		keystorePassphrase, err := readPassword("Keystore passphrase:")
-		if err != nil {
-			log.Fatal(err)
-		}
+		keystorePassphrase := getKeystoreCredentials()
 
-		CreateKeystore(keystorePassphrase)
+		pubKey, wallet := CreateKeystore(keystorePassphrase)
+
+		printKeystoreDetails(pubKey, wallet)
+
 		SyncKeys()
 
 	} else {
@@ -161,12 +179,27 @@ func auth() {
 // Commit => "sign"
 func Sign(filename string, owner string) {
 	hash := hash(filename)
-
 	reader := bufio.NewReader(os.Stdin)
 
-	fmt.Println()
+	// check for token
+	token, _ := LoadToken()
+	if token == "" {
+		fmt.Println("You need to be logged in to sign.")
+		fmt.Println("Proceed by authenticating yourself using <vcn auth>")
+		//PrintErrorURLCustom("token", 428)
+		os.Exit(1)
+	}
 
-	output := "" +
+	// keystore
+	hasKeystore, _ := HasKeystore()
+	if hasKeystore == false {
+		fmt.Printf("You need a keystore to sign.\n")
+		fmt.Println("Proceed by authenticating yourself using <vcn auth>")
+		//PrintErrorURLCustom("keystore", 428)
+		os.Exit(1)
+	}
+
+	output := "\n" +
 		"vChain CodeNotary - code signing made easy:\n" +
 		"-------------------------------------------\n" +
 		"Attention, by signing this artifact you implicitly claim its ownership.\n" +
