@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"os/exec"
 	"strings"
 	"syscall"
 
@@ -94,4 +95,58 @@ func formatErrorURLByEndpoint(resource string, verb string, status int) string {
 
 	return fmt.Sprintf("%s%s-%s-%d", errorPage, resource, strings.ToLower(verb), status)
 
+}
+
+func checkJQExists() {
+	_, err := exec.LookPath("jq")
+	if err != nil {
+		fmt.Printf("<jq> is not installed.")
+		PrintErrorURLCustom("jq", 404)
+	}
+}
+
+func getDockerHash(param string) (hash string) {
+
+	checkJQExists()
+
+	dockerID := strings.Replace(param, "docker:", "", 1)
+	//fmt.Println(dockerID)
+
+	// TODO: sanitize even further
+	// so far, let's check dockerID is a string without whitespaces
+	dockerID = strings.Replace(dockerID, " ", "", -1)
+
+	// docker inspect <image> | jq -c ".[0].Id"
+	cmd := fmt.Sprintf(`docker inspect %s | jq -c ".[0].Id"`, dockerID)
+	output, err := exec.Command("bash", "-c", cmd).Output()
+	if err != nil {
+		fmt.Printf("Failed to execute command: %s", cmd)
+		os.Exit(1)
+	}
+	hash = string(output)
+	hash = strings.Replace(hash, `"`, ``, -1)
+	hash = strings.Replace(hash, "sha256:", "", 1)
+	/*
+		c1 := exec.Command("docker", "inspect", dockerID)
+		c2 := exec.Command("jq", "-c", ".[0].Id")
+
+		c2.Stdin, _ = c1.StdoutPipe()
+		c2.Stdout = os.Stdout
+		_ = c2.Start()
+		_ = c1.Run()
+		_ = c2.Wait()
+
+		out, err := c2.Output()
+		if err != nil {
+			log.Fatalf("cmd.Run() failed with %s\n", err)
+		}
+		fmt.Printf("combined out:\n%s\n", string(out))
+	*/
+
+	// I wasted 2 hours of my precious life looking for a wqy
+	// to unmarshal JSON in golang
+	// with an unknown JSON scheme
+	// in combination with a top-level array
+
+	return hash
 }

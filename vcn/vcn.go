@@ -54,7 +54,7 @@ func main() {
 			Usage:    "Sign commits and artifact's hash onto the blockchain",
 			Action: func(c *cli.Context) error {
 				if c.NArg() == 0 {
-					return fmt.Errorf("filename required")
+					return fmt.Errorf("filename or type:reference required")
 				}
 				Sign(c.Args().First(), "me")
 				return nil

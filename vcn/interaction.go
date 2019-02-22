@@ -178,8 +178,6 @@ func auth() {
 
 // Commit => "sign"
 func Sign(filename string, owner string) {
-	hash := hash(filename)
-	reader := bufio.NewReader(os.Stdin)
 
 	// check for token
 	token, _ := LoadToken()
@@ -198,6 +196,26 @@ func Sign(filename string, owner string) {
 		//PrintErrorURLCustom("keystore", 428)
 		os.Exit(1)
 	}
+
+	var artifactHash string
+
+	// artifact types
+	if strings.HasPrefix(filename, "docker:") {
+
+		artifactHash = getDockerHash(filename)
+		//fmt.Printf("Docker: Not yet implemented\n")
+		//os.Exit(1)
+
+	} else if strings.HasPrefix(filename, "git:") {
+		fmt.Printf("git: Not yet implemented\n")
+		os.Exit(1)
+	} else {
+		// file mode
+		artifactHash = hash(filename)
+
+	}
+
+	reader := bufio.NewReader(os.Stdin)
 
 	output := "\n" +
 		"vChain CodeNotary - code signing made easy:\n" +
@@ -233,12 +251,12 @@ func Sign(filename string, owner string) {
 	go displayLatency()
 
 	// TODO: return and display: block #, trx #
-	commitHash(hash, owner, string(passphrase), filename)
+	commitHash(artifactHash, owner, string(passphrase), filename)
 	fmt.Println("")
-	fmt.Println("File:\t", filename)
-	fmt.Println("Hash:\t", hash)
-	fmt.Println("Date:\t", time.Now())
-	fmt.Println("Signer:\t", owner)
+	fmt.Println("Artifact:\t\t", filename)
+	fmt.Println("Hash:\t\t", artifactHash)
+	fmt.Println("Date:\t\t", time.Now())
+	fmt.Println("Signer:\t\t", owner)
 }
 
 // VerifyAll => main entry point from cli
@@ -249,10 +267,22 @@ func VerifyAll(files []string) {
 	}
 }
 func verify(filename string) {
-	hash := strings.TrimSpace(hash(filename))
-	verified, owner, timestamp := verifyHash(hash)
+
+	var artifactHash string
+
+	// TODO: make this switch available for all functions
+	if strings.HasPrefix(filename, "docker:") {
+
+		artifactHash = getDockerHash(filename)
+		//fmt.Printf("Docker: Not yet implemented\n")
+		//os.Exit(1)
+	} else {
+		artifactHash = strings.TrimSpace(hash(filename))
+	}
+
+	verified, owner, timestamp := verifyHash(artifactHash)
 	fmt.Println("File:\t", filename)
-	fmt.Println("Hash:\t", hash)
+	fmt.Println("Hash:\t", artifactHash)
 	if timestamp != 0 {
 		fmt.Println("Date:\t", time.Unix(timestamp, 0))
 	}
