@@ -38,7 +38,7 @@ func main() {
 			Usage:    "Verify digital artifact against blockchain",
 			Action: func(c *cli.Context) error {
 				if c.NArg() == 0 {
-					return fmt.Errorf("filenames required")
+					return fmt.Errorf("assets required")
 				}
 				VerifyAll(c.Args())
 				return nil

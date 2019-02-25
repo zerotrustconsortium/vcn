@@ -102,6 +102,7 @@ func checkJQExists() {
 	if err != nil {
 		fmt.Printf("<jq> is not installed.")
 		PrintErrorURLCustom("jq", 404)
+		os.Exit(1)
 	}
 }
 
@@ -110,7 +111,6 @@ func getDockerHash(param string) (hash string) {
 	checkJQExists()
 
 	dockerID := strings.Replace(param, "docker:", "", 1)
-	//fmt.Println(dockerID)
 
 	// TODO: sanitize even further
 	// so far, let's check dockerID is a string without whitespaces
@@ -119,13 +119,24 @@ func getDockerHash(param string) (hash string) {
 	// docker inspect <image> | jq -c ".[0].Id"
 	cmd := fmt.Sprintf(`docker inspect %s | jq -c ".[0].Id"`, dockerID)
 	output, err := exec.Command("bash", "-c", cmd).Output()
+
 	if err != nil {
 		fmt.Printf("Failed to execute command: %s", cmd)
+		PrintErrorURLCustom("docker", 500)
 		os.Exit(1)
 	}
+	// ugly hack: better read in the docker information
+	// with a proper os.exec below
+	if strings.TrimSpace(string(output)) == "null" {
+		fmt.Printf("Docker image cannot be found: <%s>", dockerID)
+		PrintErrorURLCustom("docker", 404)
+		os.Exit(1)
+	}
+
 	hash = string(output)
 	hash = strings.Replace(hash, `"`, ``, -1)
 	hash = strings.Replace(hash, "sha256:", "", 1)
+
 	/*
 		c1 := exec.Command("docker", "inspect", dockerID)
 		c2 := exec.Command("jq", "-c", ".[0].Id")
