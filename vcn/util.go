@@ -107,18 +107,7 @@ func formatErrorURLByEndpoint(resource string, verb string, status int) string {
 
 }
 
-func checkJQExists() {
-	_, err := exec.LookPath("jq")
-	if err != nil {
-		fmt.Printf("<jq> is not installed.")
-		PrintErrorURLCustom("jq", 404)
-		os.Exit(1)
-	}
-}
-
 func getDockerHash(param string) (hash string) {
-
-	checkJQExists()
 
 	dockerID := strings.Replace(param, "docker:", "", 1)
 
