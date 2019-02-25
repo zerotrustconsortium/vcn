@@ -136,7 +136,7 @@ func getDockerHash(param string) (hash string) {
 	cmd := exec.Command("docker", "inspect", dockerID)
 	cmdOutput, err := cmd.Output()
 	if err != nil {
-		fmt.Printf(fmt.Sprintf("Failed to execute command: %s", cmd))
+		fmt.Printf(fmt.Sprintf("Failed to execute docekr inspect command."))
 		fmt.Printf(err.Error())
 		PrintErrorURLCustom("docker", 500)
 		os.Exit(1)
