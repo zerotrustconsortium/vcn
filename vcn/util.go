@@ -9,6 +9,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -19,6 +20,7 @@ import (
 	"syscall"
 
 	"github.com/fatih/color"
+	"github.com/yalp/jsonpath"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
@@ -124,48 +126,39 @@ func getDockerHash(param string) (hash string) {
 	// so far, let's check dockerID is a string without whitespaces
 	dockerID = strings.Replace(dockerID, " ", "", -1)
 
-	// docker inspect <image> | jq -c ".[0].Id"
-	cmd := fmt.Sprintf(`docker inspect %s | jq -c ".[0].Id"`, dockerID)
-	output, err := exec.Command("bash", "-c", cmd).Output()
+	/*
 
+		hash = string(output)
+		hash = strings.Replace(hash, `"`, ``, -1)
+		hash = strings.Replace(hash, "sha256:", "", 1)
+	*/
+
+	cmd := exec.Command("docker", "inspect", dockerID)
+	cmdOutput, err := cmd.Output()
 	if err != nil {
-		fmt.Printf("Failed to execute command: %s", cmd)
+		fmt.Printf(fmt.Sprintf("Failed to execute command: %s", cmd))
+		fmt.Printf(err.Error())
 		PrintErrorURLCustom("docker", 500)
 		os.Exit(1)
 	}
-	// ugly hack: better read in the docker information
-	// with a proper os.exec below
-	if strings.TrimSpace(string(output)) == "null" {
-		fmt.Printf("Docker image cannot be found: <%s>", dockerID)
-		PrintErrorURLCustom("docker", 404)
-		os.Exit(1)
+
+	//var dockerInspect interface {}
+	dockerIDFilter, err := jsonpath.Prepare("$..Id")
+	if err != nil {
+		panic(err)
+	}
+	var data interface{}
+	if err = json.Unmarshal(cmdOutput, &data); err != nil {
+		panic(err)
+	}
+	out, err := dockerIDFilter(data)
+	if err != nil {
+		panic(err)
 	}
 
-	hash = string(output)
-	hash = strings.Replace(hash, `"`, ``, -1)
-	hash = strings.Replace(hash, "sha256:", "", 1)
+	// out is an interface which needs to be coreced into string array before
+	dockerHash := out.([]interface{})[0]
+	dockerHashStr := strings.TrimSpace(strings.Replace(fmt.Sprint(dockerHash), "sha256:", "", 1))
 
-	/*
-		c1 := exec.Command("docker", "inspect", dockerID)
-		c2 := exec.Command("jq", "-c", ".[0].Id")
-
-		c2.Stdin, _ = c1.StdoutPipe()
-		c2.Stdout = os.Stdout
-		_ = c2.Start()
-		_ = c1.Run()
-		_ = c2.Wait()
-
-		out, err := c2.Output()
-		if err != nil {
-			log.Fatalf("cmd.Run() failed with %s\n", err)
-		}
-		fmt.Printf("combined out:\n%s\n", string(out))
-	*/
-
-	// I wasted 2 hours of my precious life looking for a wqy
-	// to unmarshal JSON in golang
-	// with an unknown JSON scheme
-	// in combination with a top-level array
-
-	return hash
+	return dockerHashStr
 }

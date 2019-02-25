@@ -27,7 +27,7 @@ func TestVerifyDocker(t *testing.T) {
 
 	verified, _, _ := verifyHash(h)
 
-	if verified != false {
+	if verified != true {
 		t.Error(fmt.Sprintf("Could not verify: <docker:%s>", helloWorld))
 	}
 
