@@ -17,6 +17,7 @@
 # Compiled binaries
 dist/vcn-*
 /vcn/vcn
+/dist
 
 # IntelliJ
 *.iml
