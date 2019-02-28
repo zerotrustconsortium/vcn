@@ -174,34 +174,17 @@ func Register(email string, accountPassword string) (ret bool, code int) {
 	return true, 0
 }
 
-func WaitForConfirmation(email string, password string, maxRounds uint64,
+func WaitForConfirmation(token string, maxRounds uint64,
 	pollInterval time.Duration) error {
 
-	fmt.Println("hier!")
-	token := new(TokenResponse)
-	authError := new(Error)
 	for i := uint64(0); i < maxRounds; i++ {
-		r, err := sling.New().
-			Post(PublisherEndpoint()+"/auth").
-			BodyJSON(AuthRequest{Email: email, Password: password}).
-			Receive(token, authError)
-		if err != nil {
-			return err
-		}
-		if r.StatusCode == 400 {
-			time.Sleep(pollInterval)
-			continue
-		}
-		if r.StatusCode == 200 {
-			err = ioutil.WriteFile(TokenFile(), []byte(token.Token),
-				os.FileMode(0600))
-			if err != nil {
-				return err
-			}
+
+		verified, _ := CheckPublisherIsVerified(token)
+
+		if verified == true {
 			return nil
 		}
-		return fmt.Errorf("wait for confirmation failed: %s (%d)",
-			authError.Message, authError.Status)
+		//return fmt.Errorf("wait for confirmation failed: %s", err)
 	}
 	return fmt.Errorf("confirmation timed out")
 }

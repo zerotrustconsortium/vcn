@@ -57,7 +57,7 @@ func login() {
 	//               api: register user
 	//               api: authenticate()
 	// api: check if verified customer
-	// no  => resend verification mail
+	// no  => point to verification mail
 	// filesystem: keystore exists
 	// no => createkeystore
 	// synckeys
@@ -152,8 +152,6 @@ func login() {
 				os.Exit(1)
 			}
 
-			wait_email_confirmation(email, accountPassword)
-
 		}
 
 	}
@@ -162,10 +160,17 @@ func login() {
 	verified, _ := CheckPublisherIsVerified(token)
 
 	if verified == false {
-		fmt.Println("You are not yet verified. Please check your email.")
-		// TODO: trigger resend verification mail
-		//wait_email_confirmation(email, )
-		os.Exit(1)
+		fmt.Println("We've sent you an email to the address you provided." +
+			"\nClick the link and you will be automatically logged in.")
+		color.Set(StyleAffordance())
+		fmt.Print("Check your email [...]")
+		color.Unset()
+		fmt.Println()
+		err := WaitForConfirmation(token,
+			60, 2*time.Second)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 	// filesystem: keystore exists
 	// no => createkeystore
@@ -196,25 +201,6 @@ func login() {
 	SyncKeys()
 
 	fmt.Println("Login successful.")
-}
-
-func wait_email_confirmation(email string, accountPassword string) {
-
-	/*
-		fmt.Println("We've sent you an email to: ", email,
-			"\nClick the link and you will be automatically logged in.")
-		color.Set(StyleAffordance())
-		fmt.Print("Check your email [...]")
-		color.Unset()
-		fmt.Println()
-		err := WaitForConfirmation(email, accountPassword,
-			60, 2*time.Second)
-		if err != nil {
-			log.Fatal(err)
-		}
-	*/
-
-	return
 }
 
 // Commit => "sign"
