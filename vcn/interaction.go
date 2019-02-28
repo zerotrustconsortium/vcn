@@ -27,97 +27,6 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 )
 
-func register() {
-
-	var keystorePassphrase string
-
-	// check for token
-	_, err := LoadToken()
-	if err == nil {
-		// if token exists it's wrong!
-		fmt.Println("You already have an account.")
-		fmt.Println("Proceed by authenticating yourself using <vcn auth>")
-		PrintErrorURLCustom("token", 428)
-		os.Exit(1)
-	}
-
-	// keystore
-	hasKeystore, err := HasKeystore()
-	if err != nil {
-		log.Fatal(err)
-	}
-	if hasKeystore {
-		// for now, we only enable ONE keystore
-		fmt.Printf("You already have a keystore.\n")
-		PrintErrorURLCustom("keystore", 428)
-		os.Exit(1)
-	}
-
-	fmt.Println("vChain.us User Registration:\n" +
-		"Should you already have an account with vChain.us\n" +
-		"please proceed by authenticating yourself using <vcn auth>")
-
-	email, accountPassword, _ := getLoginCredentials()
-
-	Register(email, accountPassword)
-
-	if !hasKeystore {
-
-		keystorePassphrase = getKeystoreCredentials()
-
-		pubKey, wallet := CreateKeystore(keystorePassphrase)
-
-		printKeystoreDetails(pubKey, wallet)
-
-		fmt.Println("We've sent you an email to: ", email,
-			"\nClick the link and you will be automatically logged in.")
-		color.Set(StyleAffordance())
-		fmt.Print("Check your email [...]")
-		color.Unset()
-		fmt.Println()
-
-		err = WaitForConfirmation(email, accountPassword,
-			60, 2*time.Second)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-
-	SyncKeys()
-}
-
-func printKeystoreDetails(pubKey string, wallet string) {
-	fmt.Println("Keystore successfully created")
-	fmt.Println("Public key:\t", pubKey)
-	fmt.Println("Keystore:\t", wallet)
-}
-func getKeystoreCredentials() (keystorePassphrase string) {
-	fmt.Println("You have no keystore set up yet.")
-	fmt.Println("<vcn> will now do this for you and upload the public key to the platform.")
-
-	keystorePassphrase, _ = readPassword("Keystore passphrase:")
-
-	return string(keystorePassphrase)
-}
-func getLoginCredentials() (email string, passwordString string, err error) {
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("Email address: ")
-	email, _ = reader.ReadString('\n')
-	email = strings.TrimSuffix(email, "\n")
-
-	fmt.Print("Password: ")
-	password, err := terminal.ReadPassword(int(syscall.Stdin))
-	passwordString = string(password)
-
-	fmt.Println("")
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return email, passwordString, nil
-}
-
 func dashboard() {
 	// open dashboard
 	// we intentionally do not read the customer's token from disk
@@ -129,51 +38,183 @@ func dashboard() {
 	browser.OpenURL(url)
 }
 
-func auth() {
+func login() {
+	// login handles both first-time registration of users
+	// and subsequent logins, unfortunately a
+	// rather complicated combination of cases
+	// ---------------------------------------
+	// filesystem: token exists && api: valid
+	// no  => enter email
+	//        api: publisher exists
+	//        yes => enter pw
+	//               authenticate()
+	//               fails => retry pw entry up to 3 times
+	//        no  => display: registration texts
+	//               confirmation that email is correct (otherwise typo leads to registration)
+	//               filesystem: keystore exists
+	//               yes => error "cannot register new customer with existing keystore"
+	//               enter password
+	//               api: register user
+	//               api: authenticate()
+	// api: check if verified customer
+	// no  => resend verification mail
+	// filesystem: keystore exists
+	// no => createkeystore
+	// synckeys
 
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("Email address: ")
-	email, _ := reader.ReadString('\n')
-	email = strings.TrimSuffix(email, "\n")
+	token, _ := LoadToken()
+	tokenValid := CheckToken(token)
 
-	fmt.Print("Password: ")
-	password, err := terminal.ReadPassword(int(syscall.Stdin))
-	passwordString := string(password)
-	fmt.Println("")
+	if tokenValid == false {
+		// most probably a new customer or an expired token
 
-	if err != nil {
-		log.Fatal(err)
+		reader := bufio.NewReader(os.Stdin)
+		fmt.Print("Email address: ")
+		email, _ := reader.ReadString('\n')
+		email = strings.TrimSuffix(email, "\n")
+
+		publisherExists := CheckPublisherExists(email)
+
+		if publisherExists {
+
+			authenticated := false
+			counter := 0
+
+			for authenticated == false {
+
+				counter++
+				attempt := ""
+				if counter == 2 {
+					attempt = " (next try)"
+				} else if counter == 3 {
+					attempt = " (final try)"
+				} else if counter == 4 {
+					PrintErrorURLCustom("password", 404)
+					os.Exit(1)
+				}
+
+				fmt.Printf("Password%s: ", attempt)
+				password, _ := terminal.ReadPassword(int(syscall.Stdin))
+				passwordString := string(password)
+				fmt.Println("")
+
+				returnCode := 0
+				authenticated, returnCode = Authenticate(email, passwordString)
+				if returnCode > 0 {
+
+					if returnCode == 401 {
+						fmt.Println("Please enter a correct password.")
+
+					}
+
+				}
+
+			}
+		} else {
+			// obviously this is a new registration
+			fmt.Println("vChain.us Publisher Registration")
+			color.Set(StyleAffordance())
+			fmt.Print("Attention: vcn will create a new account for you.")
+			color.Unset()
+			fmt.Printf("\nIs this your email address <%s>? (y/N):", email)
+
+			question, _ := reader.ReadString('\n')
+
+			if strings.TrimSpace(question) != "y" {
+				fmt.Println("Ok - exiting.")
+				os.Exit(1)
+			}
+
+			hasKeystore, _ := HasKeystore()
+			if hasKeystore == true {
+
+				fmt.Println("Cannot register customer with existing keystore.")
+				PrintErrorURLCustom("keystore", 428)
+				os.Exit(1)
+			}
+
+			fmt.Print("Choose an account password: ")
+			password, _ := terminal.ReadPassword(int(syscall.Stdin))
+			accountPassword := string(password)
+			fmt.Println("")
+
+			ret, returnCode := Register(email, accountPassword)
+			if ret == false {
+				// somehow hacky to put this into interaction.go
+				// nonetheless Register is now a clean interface void of cli I/O
+				PrintErrorURLByEndpoint(PublisherEndpoint(), "POST", returnCode)
+				os.Exit(1)
+			}
+
+			authenticated, _ := Authenticate(email, accountPassword)
+			if authenticated == false {
+				fmt.Println("Could not log you in.")
+				os.Exit(1)
+			}
+
+			wait_email_confirmation(email, accountPassword)
+
+		}
+
 	}
+	// api: check if verified customer
+	token, _ = LoadToken() // looks superfluous; would not be set if auth / register only happens above
+	verified, _ := CheckPublisherIsVerified(token)
 
-	ret := Authenticate(email, passwordString)
-
-	if ret {
-		fmt.Println("Authentication successful.")
+	if verified == false {
+		fmt.Println("You are not yet verified. Please check your email.")
+		// TODO: trigger resend verification mail
+		//wait_email_confirmation(email, )
+		os.Exit(1)
 	}
-
-	// check for a keystore right now and hint at creating one
-	// this is for the case of a newly registered customer
-	// coming in from the dashboard
-	// doing vcn auth for the very first time
-	// and no keystore is yet present
+	// filesystem: keystore exists
+	// no => createkeystore
+	// synckeys
 	hasKeystore, err := HasKeystore()
 	if err != nil {
 		log.Fatal(err)
 	}
 	if hasKeystore == false {
 
-		keystorePassphrase := getKeystoreCredentials()
+		fmt.Println("You have no keystore set up yet.")
+		fmt.Println("<vcn> will now do this for you and upload the public key to the platform.")
+
+		color.Set(StyleAffordance())
+		fmt.Print("Attention: Please pick a strong password. There is no recovery possible.")
+		color.Unset()
+		fmt.Println()
+
+		keystorePassphrase, _ := readPassword("Keystore passphrase: ")
 
 		pubKey, wallet := CreateKeystore(keystorePassphrase)
 
-		printKeystoreDetails(pubKey, wallet)
+		fmt.Println("Keystore successfully created")
+		fmt.Println("Public key:\t", pubKey)
+		fmt.Println("Keystore:\t", wallet)
 
-		SyncKeys()
-
-	} else {
-		SyncKeys()
 	}
+	SyncKeys()
 
+	fmt.Println("Login successful.")
+}
+
+func wait_email_confirmation(email string, accountPassword string) {
+
+	/*
+		fmt.Println("We've sent you an email to: ", email,
+			"\nClick the link and you will be automatically logged in.")
+		color.Set(StyleAffordance())
+		fmt.Print("Check your email [...]")
+		color.Unset()
+		fmt.Println()
+		err := WaitForConfirmation(email, accountPassword,
+			60, 2*time.Second)
+		if err != nil {
+			log.Fatal(err)
+		}
+	*/
+
+	return
 }
 
 // Commit => "sign"

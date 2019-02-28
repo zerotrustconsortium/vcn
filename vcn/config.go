@@ -19,7 +19,7 @@ import (
 )
 
 func StyleAffordance() (color.Attribute, color.Attribute, color.Attribute) {
-	return color.FgHiGreen, color.BgHiWhite, color.Bold
+	return color.FgHiBlue, color.BgWhite, color.Bold
 }
 func StyleError() (color.Attribute, color.Attribute, color.Attribute) {
 	return color.FgHiRed, color.BgHiWhite, color.Bold
@@ -40,6 +40,10 @@ func FoundationEndpoint() string {
 
 func PublisherEndpoint() string {
 	return FoundationEndpoint() + "/v1/publisher"
+}
+
+func ROLE_CONFIRMED_USER() string {
+	return "ROLE_CONFIRMED_USER"
 }
 
 func WalletEndpoint() string {

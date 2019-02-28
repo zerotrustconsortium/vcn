@@ -76,16 +76,13 @@ func main() {
 		},
 		{
 			Category: "User actions",
-			Name:     "auth",
+			Name:     "login",
 			Aliases:  []string{"a"},
-			Usage:    "Authenticate with dashboard at vChain.us",
+			Usage:    "Initial sign-up and subsequent sign-in",
 			Action: func(c *cli.Context) error {
 
-				auth()
+				login()
 				return nil
-			},
-			Flags: []cli.Flag{
-				cli.BoolFlag{Name: "hash"},
 			},
 		},
 		{
@@ -97,20 +94,6 @@ func main() {
 
 				dashboard()
 				return nil
-			},
-		},
-		{
-			Category: "User actions",
-			Name:     "register",
-			Aliases:  []string{"r"},
-			Usage:    "Register an account with vChain.us",
-			Action: func(c *cli.Context) error {
-
-				register()
-				return nil
-			},
-			Flags: []cli.Flag{
-				cli.BoolFlag{Name: "hash"},
 			},
 		},
 	}

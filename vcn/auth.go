@@ -12,6 +12,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/dghubble/sling"
@@ -34,7 +35,63 @@ type Error struct {
 	Error     string `json:"error"`
 }
 
-func Authenticate(email string, password string) (ret bool) {
+type PublisherExistsResponse struct {
+	Exists bool `json:"exists"`
+}
+type PublisherExistsParams struct {
+	Email string `url:"email"`
+}
+type PublisherResponse struct {
+	Authorities []string `json:"authorities"`
+	Email       string   `json:"email"`
+	FirstName   string   `json:"firstName"`
+	LastName    string   `json:"lastName"`
+}
+
+func CheckPublisherExists(email string) (ret bool) {
+
+	email = strings.TrimSpace(email)
+
+	params := &PublisherExistsParams{Email: email}
+	response := new(PublisherExistsResponse)
+	restError := new(Error)
+
+	r, err := sling.New().
+		Get(PublisherEndpoint()+"/exists").
+		QueryStruct(params).
+		Receive(&response, restError)
+
+	if err != nil {
+		fmt.Printf(err.Error())
+		return false
+	}
+	if r.StatusCode != 200 {
+
+		fmt.Printf(fmt.Sprintf("request failed: %s (%d)",
+			restError.Message, restError.Status))
+		return false
+	}
+
+	return response.Exists
+}
+
+func CheckToken(token string) (ret bool) {
+
+	if token == "" {
+		return false
+	}
+	// TODO: change api call to real check token
+	_, status := CheckPublisherIsVerified(token)
+
+	//fmt.Println(status)
+	if status == 0 {
+		return true
+	}
+	return false
+
+}
+
+func Authenticate(email string, password string) (ret bool, code int) {
 
 	token := new(TokenResponse)
 	authError := new(Error)
@@ -47,8 +104,11 @@ func Authenticate(email string, password string) (ret bool) {
 		log.Fatal(err)
 	}
 	if r.StatusCode != 200 {
-		log.Fatalf("request failed: %s (%d)", authError.Message,
+		// TODO: DEBUG LOG LEVEL
+		fmt.Printf("request failed: %s (%d)\n", authError.Message,
 			authError.Status)
+		return false, authError.Status
+
 	}
 	err = ioutil.WriteFile(TokenFile(), []byte(token.Token),
 		os.FileMode(0600))
@@ -56,12 +116,43 @@ func Authenticate(email string, password string) (ret bool) {
 		log.Fatal(err)
 	}
 
-	return true
+	return true, 0
 
 }
 
+func CheckPublisherIsVerified(token string) (ret bool, status int) {
+
+	restError := new(Error)
+	response := new(PublisherResponse)
+
+	r, err := sling.New().
+		Get(PublisherEndpoint()).
+		Add("Authorization", "Bearer "+token).
+		Receive(&response, restError)
+
+	if err != nil {
+		// TODO DEBUG LEVEL
+		//fmt.Printf(err.Error())
+		return false, 500
+	}
+	if r.StatusCode != 200 {
+
+		fmt.Printf(fmt.Sprintf("request failed: %s (%d)",
+			restError.Message, restError.Status))
+		return false, restError.Status
+	}
+
+	for _, el := range response.Authorities {
+		if el == ROLE_CONFIRMED_USER() {
+			return true, 0
+		}
+	}
+
+	return false, 404
+}
+
 // Register creates an Account with vChain.us
-func Register(email string, accountPassword string) {
+func Register(email string, accountPassword string) (ret bool, code int) {
 
 	authError := new(Error)
 	//var apiError string
@@ -75,15 +166,18 @@ func Register(email string, accountPassword string) {
 	}
 	if r.StatusCode != 200 {
 		//GET-v1-artifact-404
-
+		// TODO debug log
 		log.Printf("request failed: %s (%d)", authError.Message, authError.Status)
-		PrintErrorURLByEndpoint(PublisherEndpoint(), "POST", authError.Status)
-		os.Exit(1)
+
+		return false, authError.Status
 	}
+	return true, 0
 }
 
 func WaitForConfirmation(email string, password string, maxRounds uint64,
 	pollInterval time.Duration) error {
+
+	fmt.Println("hier!")
 	token := new(TokenResponse)
 	authError := new(Error)
 	for i := uint64(0); i < maxRounds; i++ {
