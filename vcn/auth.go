@@ -81,14 +81,38 @@ func CheckToken(token string) (ret bool) {
 		return false
 	}
 	// TODO: change api call to real check token
-	_, status := CheckPublisherIsVerified(token)
+	/*
+		_, status := CheckPublisherIsVerified(token)
 
-	//fmt.Println(status)
-	if status == 0 {
+		//fmt.Println(status)
+		if status == 0 {
+			return true
+		}
+		return false
+	*/
+	restError := new(Error)
+	//response := new(PublisherResponse)
+
+	r, err := sling.New().
+		Get(TokenCheckEndpoint()).
+		Add("Authorization", "Bearer "+token).
+		Receive(nil, restError)
+
+	if err != nil {
+		// TODO DEBUG LEVEL
+		//fmt.Printf(err.Error())
+		return false
+	}
+	switch r.StatusCode {
+	case 403:
+		fmt.Println("Token not found")
+	case 419:
+		fmt.Println("Token expired")
+	case 200:
 		return true
 	}
-	return false
 
+	return false
 }
 
 func Authenticate(email string, password string) (ret bool, code int) {
