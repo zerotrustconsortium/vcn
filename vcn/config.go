@@ -38,6 +38,10 @@ func FoundationEndpoint() string {
 	return "https://api.staging.vchain.us/foundation"
 }
 
+func TrackingEvent() string {
+	return FoundationEndpoint() + "/v1/tracking-event"
+}
+
 func TokenCheckEndpoint() string {
 	return PublisherEndpoint() + "/auth/check"
 }

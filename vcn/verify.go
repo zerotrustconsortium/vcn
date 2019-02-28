@@ -11,13 +11,51 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
 
+	"github.com/dghubble/sling"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
+type ArtifactVerifyTrackerRequest struct {
+	Type     string `json:"type"`
+	Metadata string `json:"metadata"`
+}
+type innerMetadata struct {
+	// this is a json streucture, but seriaized to string
+	Hash string `json:"hash"`
+}
+
+func artifactTracker(hash string) {
+
+	// some gymnastics with json strings
+	md := &innerMetadata{Hash: hash}
+	ser, _ := json.Marshal(md)
+	//fmt.Println(string(ser))
+
+	restError := new(Error)
+	r, err := sling.New().
+		Post(TrackingEvent()).
+		BodyJSON(ArtifactVerifyTrackerRequest{
+			Type:     "VERIFY",
+			Metadata: string(ser),
+		}).Receive(nil, restError)
+	if err != nil {
+		fmt.Println(err)
+
+	}
+	if r.StatusCode != 200 {
+		fmt.Println(fmt.Errorf("request failed: %s (%d)", restError.Message,
+			restError.Status))
+	}
+
+}
+
 func verifyHash(hash string) (verified bool, owner string, timestamp int64) {
+
 	client, err := ethclient.Dial(MainNetEndpoint())
 	if err != nil {
 		log.Fatal(err)
@@ -31,5 +69,6 @@ func verifyHash(hash string) (verified bool, owner string, timestamp int64) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	return artifact.Owner != "", artifact.Owner, artifact.Timestamp.Int64()
 }

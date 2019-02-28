@@ -307,7 +307,11 @@ func verify(filename string) {
 		artifactHash = strings.TrimSpace(hash(filename))
 	}
 
+	// fire a go routine for the tracking that shall not delay the main user interaction
+	go artifactTracker(artifactHash)
+
 	verified, owner, timestamp := verifyHash(artifactHash)
+
 	fmt.Println("File:\t", filename)
 	fmt.Println("Hash:\t", artifactHash)
 	if timestamp != 0 {
