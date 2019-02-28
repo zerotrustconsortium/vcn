@@ -15,10 +15,36 @@ import (
 	"log"
 	"os"
 
+	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
 
+var log2 = logrus.New()
+
 func main() {
+
+	ll := os.Getenv("LOG_LEVEL")
+	switch ll {
+	case "INFO":
+		log2.SetLevel(logrus.InfoLevel)
+	case "TRACE":
+		log2.SetLevel(logrus.TraceLevel)
+	default:
+		log2.SetLevel(logrus.WarnLevel)
+
+	}
+
+	log2.WithFields(logrus.Fields{
+		"animal": "walrus",
+		"size":   10,
+	}).Info("A group of walrus emerges from the ocean")
+
+	log2.WithFields(logrus.Fields{
+		"animal": "walrus",
+		"size":   10,
+	}).Warn("A group of walrus emerges from the ocean")
+	log2.Trace("A group of walrus emerges from the ocean")
+
 	app := cli.NewApp()
 	app.Name = "vcn"
 	app.Usage = "code signing made easy"
