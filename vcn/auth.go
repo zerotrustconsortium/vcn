@@ -80,16 +80,7 @@ func CheckToken(token string) (ret bool) {
 	if token == "" {
 		return false
 	}
-	// TODO: change api call to real check token
-	/*
-		_, status := CheckPublisherIsVerified(token)
 
-		//fmt.Println(status)
-		if status == 0 {
-			return true
-		}
-		return false
-	*/
 	restError := new(Error)
 	//response := new(PublisherResponse)
 
