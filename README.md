@@ -51,17 +51,46 @@ $> ./vcn
 
 ## Usage
 
-Start with the `register` verb; the cli will walk you through account creation
+Start with the `login` verb; the cli will walk you through account creation
 and setting up your keystore.
 ```
 $> vcn --help
-$> vcn register
+$> vcn login
 ```
 
 You're good to use `verify` without the above registration.
 
 ```
 $> vcn verify <file>
+$> vcn verify docker:<imageId>
+```
+
+Once your public key is known on the blockchain you can sign assets:
+
+```
+$> vcn sign <file>
+$> vcn sign docker:<image>
+```
+
+Have a look at analytics and extended functionality on the dashboard (browser needed):
+
+```
+$> vcn dashboard
+```
+
+Fetch all assets you've signed:
+
+```
+$> vcn list
+```
+
+You're good to start doing really cool things, e.g.
+
+```
+# run only when verified
+$> vcn verify docker:hello-world && docker run hello-world
+
+$> ls | xargs vcn verify
 ```
 
 ## Development
