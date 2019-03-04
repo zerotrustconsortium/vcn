@@ -21,6 +21,8 @@ import (
 
 var log2 = logrus.New()
 
+var VCN_VERSION = "0.2.2"
+
 func main() {
 
 	ll := os.Getenv("LOG_LEVEL")
@@ -42,7 +44,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "vcn"
 	app.Usage = "code signing made easy"
-	app.Version = "0.2.1"
+	app.Version = VCN_VERSION
 
 	app.Commands = []cli.Command{
 		// possible commands:

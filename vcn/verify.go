@@ -26,15 +26,15 @@ type ArtifactVerifyTrackerRequest struct {
 }
 type innerMetadata struct {
 	// this is a json streucture, but seriaized to string
-	Hash string `json:"hash"`
+	Hash   string `json:"hash"`
+	Client string `json:"client"`
 }
 
 func artifactTracker(hash string) {
 
 	// some gymnastics with json strings
-	md := &innerMetadata{Hash: hash}
+	md := &innerMetadata{Hash: hash, Client: "vcn" + VCN_VERSION}
 	ser, _ := json.Marshal(md)
-	//fmt.Println(string(ser))
 
 	restError := new(Error)
 	r, err := sling.New().
