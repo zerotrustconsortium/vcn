@@ -20,28 +20,43 @@ import (
 	"github.com/urfave/cli"
 )
 
-var log2 = logrus.New()
+//  global variables (rethink this approach)
 
+// LOG logrus logging
+var LOG = logrus.New()
+
+// VCN_VERSION sets the version for the build + some logging with analytics
 var VCN_VERSION = "0.2.2"
+
+// WG waitgroup for sync of threads across the whole project
 var WG sync.WaitGroup
 
 func main() {
 
 	ll := os.Getenv("LOG_LEVEL")
 	switch ll {
-	case "INFO":
-		log2.SetLevel(logrus.InfoLevel)
 	case "TRACE":
-		log2.SetLevel(logrus.TraceLevel)
+		LOG.SetLevel(logrus.TraceLevel)
+	case "DEBUG":
+		LOG.SetLevel(logrus.DebugLevel)
+	case "INFO":
+		LOG.SetLevel(logrus.InfoLevel)
+	case "WARN":
+		LOG.SetLevel(logrus.WarnLevel)
+	case "ERROR":
+		LOG.SetLevel(logrus.ErrorLevel)
+	case "FATAL":
+		LOG.SetLevel(logrus.FatalLevel)
+	case "PANIC":
+		LOG.SetLevel(logrus.PanicLevel)
 	default:
-		log2.SetLevel(logrus.WarnLevel)
+		LOG.SetLevel(logrus.WarnLevel)
 
 	}
 
-	log2.WithFields(logrus.Fields{
-		"animal": "walrus",
-		"size":   10,
-	}).Trace("A group of vChain-notarized walrus emerges from the ocean")
+	LOG.WithFields(logrus.Fields{
+		"version": VCN_VERSION,
+	}).Trace("Started vcn")
 
 	app := cli.NewApp()
 	app.Name = "vcn"
@@ -49,11 +64,6 @@ func main() {
 	app.Version = VCN_VERSION
 
 	app.Commands = []cli.Command{
-		// possible commands:
-		// trace <artifact>
-		// list <pubkey>
-		// search <block>
-		// display validators
 
 		{
 			Category: "Artifact actions",
