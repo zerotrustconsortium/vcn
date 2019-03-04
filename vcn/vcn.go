@@ -14,6 +14,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sync"
 
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
@@ -22,6 +23,7 @@ import (
 var log2 = logrus.New()
 
 var VCN_VERSION = "0.2.2"
+var WG sync.WaitGroup
 
 func main() {
 

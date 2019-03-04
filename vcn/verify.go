@@ -32,6 +32,10 @@ type innerMetadata struct {
 
 func artifactTracker(hash string) {
 
+	// make sure the tracker does its analytics although the main
+	// thread against the BC has already finalized
+	defer WG.Done()
+
 	// some gymnastics with json strings
 	md := &innerMetadata{Hash: hash, Client: "vcn" + VCN_VERSION}
 	ser, _ := json.Marshal(md)

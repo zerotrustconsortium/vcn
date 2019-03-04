@@ -308,6 +308,7 @@ func verify(filename string) {
 	}
 
 	// fire a go routine for the tracking that shall not delay the main user interaction
+	WG.Add(1)
 	go artifactTracker(artifactHash)
 
 	verified, owner, timestamp := verifyHash(artifactHash)
@@ -332,6 +333,9 @@ func verify(filename string) {
 	}
 	color.Unset()
 	fmt.Println()
+
+	// wait for the asset tracker to put data to analytics
+	WG.Wait()
 }
 
 func displayLatency() {
