@@ -329,7 +329,7 @@ func verify(filename string) {
 	} else {
 		color.Set(color.FgHiWhite, color.BgMagenta, color.Bold)
 		fmt.Print("UNKNOWN")
-		//defer os.Exit(1)
+		defer os.Exit(1)
 	}
 	color.Unset()
 	fmt.Println()
