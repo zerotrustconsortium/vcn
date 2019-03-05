@@ -11,23 +11,20 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 
 	"github.com/dghubble/sling"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/sirupsen/logrus"
 )
 
 type ArtifactVerifyTrackerRequest struct {
-	Type     string `json:"type"`
-	Metadata string `json:"metadata"`
-}
-type innerMetadata struct {
-	// this is a json streucture, but seriaized to string
-	Hash   string `json:"hash"`
-	Client string `json:"client"`
+	Client   string `json:"type"`
+	Filename string `json:"filename"`
+	Hash     string `json:"hash"`
+	Url      string `json:"url"`
 }
 
 func artifactTracker(hash string) {
@@ -36,24 +33,28 @@ func artifactTracker(hash string) {
 	// thread against the BC has already finalized
 	defer WG.Done()
 
-	// some gymnastics with json strings
-	md := &innerMetadata{Hash: hash, Client: "vcn" + VCN_VERSION}
-	ser, _ := json.Marshal(md)
-
 	restError := new(Error)
 	r, err := sling.New().
-		Post(TrackingEvent()).
+		Post(TrackingEvent()+"/verify").
+		//Add("Authorization", "Bearer "+token).
 		BodyJSON(ArtifactVerifyTrackerRequest{
-			Type:     "VERIFY",
-			Metadata: string(ser),
+			Client: "VCN:" + VCN_VERSION,
+			Hash:   hash,
 		}).Receive(nil, restError)
 	if err != nil {
 		fmt.Println(err)
 
 	}
 	if r.StatusCode != 200 {
-		fmt.Println(fmt.Errorf("request failed: %s (%d)", restError.Message,
-			restError.Status))
+
+		LOG.WithFields(logrus.Fields{
+			"errMsg": restError.Message,
+			"status": restError.Status,
+		}).Error("API analytics failed")
+	} else {
+		LOG.WithFields(logrus.Fields{
+			"hash": hash,
+		}).Info("Verify tracker / analytics written")
 	}
 
 }
