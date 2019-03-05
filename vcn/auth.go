@@ -65,7 +65,7 @@ func loginTracker(token string) {
 		Post(TrackingEvent()+"/publisher").
 		Add("Authorization", "Bearer "+token).
 		BodyJSON(LoginTrackerRequest{
-			Name: "VCN_LOGIN:" + VCN_VERSION,
+			Name: "VCN_LOGIN",
 		}).Receive(nil, restError)
 	if err != nil {
 		LOG.WithFields(logrus.Fields{
