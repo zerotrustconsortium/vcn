@@ -48,6 +48,42 @@ type PublisherResponse struct {
 	LastName    string   `json:"lastName"`
 }
 
+type LoginTrackerRequest struct {
+	Name string `json:"name"`
+}
+
+func loginTracker(token string) {
+
+	LOG.Trace("loginTracker() started")
+
+	// make sure the tracker does its analytics although the main
+	// thread has already finalized
+	defer WG.Done()
+
+	restError := new(Error)
+	r, err := sling.New().
+		Post(TrackingEvent()+"/publisher").
+		Add("Authorization", "Bearer "+token).
+		BodyJSON(LoginTrackerRequest{
+			Name: "VCN_LOGIN:" + VCN_VERSION,
+		}).Receive(nil, restError)
+	if err != nil {
+		LOG.WithFields(logrus.Fields{
+			"version": VCN_VERSION,
+		}).Warn("Login analytics seems broken: %s", err)
+
+	}
+	if r.StatusCode != 200 {
+		LOG.WithFields(logrus.Fields{
+			"errorMsg": restError.Message,
+			"status":   restError.Status,
+		}).Warn("Login analytics API failed")
+	}
+
+	LOG.Trace("loginTracker() finished")
+
+}
+
 func CheckPublisherExists(email string) (ret bool) {
 
 	email = strings.TrimSpace(email)

@@ -53,7 +53,7 @@ func login() {
 
 	token, _ := LoadToken()
 	tokenValid := CheckToken(token)
-  
+
 	if tokenValid == false {
 
 		reader := bufio.NewReader(os.Stdin)
@@ -120,6 +120,11 @@ func login() {
 
 	}
 
+	// track successful login as early as possible
+	// fire a go routine for the tracking that shall not delay the main user interaction
+	WG.Add(1)
+	go loginTracker(token)
+
 	hasKeystore, err := HasKeystore()
 	if err != nil {
 		LOG.WithFields(logrus.Fields{
@@ -161,9 +166,13 @@ func login() {
 		fmt.Println("Keystore:\t", wallet)
 
 	}
+
+	//
 	SyncKeys()
 
 	fmt.Println("Login successful.")
+
+	WG.Wait()
 
 }
 
