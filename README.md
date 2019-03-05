@@ -51,8 +51,10 @@ $> ./vcn
 
 ## Usage
 
-Start with the `login` verb; the cli will walk you through account creation
-and setting up your keystore.
+Register an account with vChain.us first.
+
+Then start with the `login` verb; the cli will walk you through login
+and setting up your local keystore upon initial use.
 ```
 $> vcn --help
 $> vcn login
@@ -84,13 +86,27 @@ Fetch all assets you've signed:
 $> vcn list
 ```
 
+### Advanced usage 
+
 You're good to start doing really cool things, e.g.
 
 ```
-# run only when verified
+# run a Docker image only when it can be successfully verified
 $> vcn verify docker:hello-world && docker run hello-world
+```
 
+```
+# verify multiple files by piping other commands' outputs into vcn
 $> ls | xargs vcn verify
+```
+
+```
+# work with environment
+# get logs (TRACE, DEBUG, INFO, WARN, ERROR, FATAL, PANIC)
+$> LOG_LEVEL=TRACE vcn login
+
+# or with a proxy
+$> HTTP_PROXY=http://localhost:3128 vcn verify <file>
 ```
 
 ## Development
