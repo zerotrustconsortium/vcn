@@ -69,8 +69,8 @@ func loginTracker(token string) {
 		}).Receive(nil, restError)
 	if err != nil {
 		LOG.WithFields(logrus.Fields{
-			"version": VCN_VERSION,
-		}).Warn("Login analytics seems broken: %s", err)
+			"err": err,
+		}).Warn("Login analytics seems broken")
 
 	}
 	if r.StatusCode != 200 {
@@ -178,30 +178,12 @@ func Authenticate(email string, password string) (ret bool, code int) {
 
 }
 
-// Register creates an Account with vChain.us
-func Register(email string, accountPassword string) (ret bool, code int) {
-
-	authError := new(Error)
-	//var apiError string
-
-	r, err := sling.New().
-		Post(PublisherEndpoint()).
-		BodyJSON(AuthRequest{Email: email, Password: accountPassword}).
-		Receive(nil, authError)
-	if err != nil {
-		log.Fatal(err)
-	}
-	if r.StatusCode != 200 {
-		//GET-v1-artifact-404
-		// TODO debug log
-		log.Printf("request failed: %s (%d)", authError.Message, authError.Status)
-
-		return false, authError.Status
-	}
-	return true, 0
-}
-
 func LoadToken() (jwtToken string, err error) {
+
+	LOG.WithFields(logrus.Fields{
+		"tokenFile": TokenFile(),
+	}).Trace("Access local token")
+
 	contents, err := ioutil.ReadFile(TokenFile())
 	if err != nil {
 		return "", err
