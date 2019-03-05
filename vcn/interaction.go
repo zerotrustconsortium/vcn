@@ -24,6 +24,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/pkg/browser"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
@@ -39,34 +40,21 @@ func dashboard() {
 }
 
 func login() {
-	// login handles both first-time registration of users
-	// and subsequent logins, unfortunately a
-	// rather complicated combination of cases
-	// ---------------------------------------
-	// filesystem: token exists && api: valid
-	// no  => enter email
+	// file system: token exists && api: token is valid
+	// no => enter email
 	//        api: publisher exists
 	//        yes => enter pw
 	//               authenticate()
 	//               fails => retry pw entry up to 3 times
-	//        no  => display: registration texts
-	//               confirmation that email is correct (otherwise typo leads to registration)
-	//               filesystem: keystore exists
-	//               yes => error "cannot register new customer with existing keystore"
-	//               enter password
-	//               api: register user
-	//               api: authenticate()
-	// api: check if verified customer
-	// no  => point to verification mail
+	//        no  => hint at registration
 	// filesystem: keystore exists
 	// no => createkeystore
 	// synckeys
 
 	token, _ := LoadToken()
 	tokenValid := CheckToken(token)
-
+  
 	if tokenValid == false {
-		// most probably a new customer or an expired token
 
 		reader := bufio.NewReader(os.Stdin)
 		fmt.Print("Email address: ")
@@ -76,6 +64,10 @@ func login() {
 		publisherExists := CheckPublisherExists(email)
 
 		if publisherExists {
+
+			LOG.WithFields(logrus.Fields{
+				"email": email,
+			}).Debug("Publisher exists")
 
 			authenticated := false
 			counter := 0
@@ -105,79 +97,34 @@ func login() {
 					if returnCode == 401 {
 						fmt.Println("Please enter a correct password.")
 
+					} else if returnCode == 400 {
+
+						PrintErrorURLCustom("customer-verification", 412)
+
+						LOG.WithFields(logrus.Fields{
+							"code": returnCode,
+						}).Fatal("API request failed: Email not confirmed.")
 					}
-
 				}
-
 			}
+
 		} else {
-			// obviously this is a new registration
-			fmt.Println("vChain.us Publisher Registration")
+			fmt.Println("It looks like you have not yet registered.")
 			color.Set(StyleAffordance())
-			fmt.Print("Attention: vcn will create a new account for you.")
+			fmt.Printf("Please create an account first at %s", DashboardURL())
 			color.Unset()
-			fmt.Printf("\nIs this your email address <%s>? (y/N):", email)
-
-			question, _ := reader.ReadString('\n')
-
-			if strings.TrimSpace(question) != "y" {
-				fmt.Println("Ok - exiting.")
-				os.Exit(1)
-			}
-
-			hasKeystore, _ := HasKeystore()
-			if hasKeystore == true {
-
-				fmt.Println("Cannot register customer with existing keystore.")
-				PrintErrorURLCustom("keystore", 428)
-				os.Exit(1)
-			}
-
-			fmt.Print("Choose an account password: ")
-			password, _ := terminal.ReadPassword(int(syscall.Stdin))
-			accountPassword := string(password)
-			fmt.Println("")
-
-			ret, returnCode := Register(email, accountPassword)
-			if ret == false {
-				// somehow hacky to put this into interaction.go
-				// nonetheless Register is now a clean interface void of cli I/O
-				PrintErrorURLByEndpoint(PublisherEndpoint(), "POST", returnCode)
-				os.Exit(1)
-			}
-
-			authenticated, _ := Authenticate(email, accountPassword)
-			if authenticated == false {
-				fmt.Println("Could not log you in.")
-				os.Exit(1)
-			}
-
+			fmt.Println()
+			dashboard()
+			os.Exit(1)
 		}
 
 	}
-	// api: check if verified customer
-	token, _ = LoadToken() // looks superfluous; would not be set if auth / register only happens above
-	verified, _ := CheckPublisherIsVerified(token)
 
-	if verified == false {
-		fmt.Println("We've sent you an email to the address you provided." +
-			"\nClick the link and you will be automatically logged in.")
-		color.Set(StyleAffordance())
-		fmt.Print("Check your email [...]")
-		color.Unset()
-		fmt.Println()
-		err := WaitForConfirmation(token,
-			60, 2*time.Second)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-	// filesystem: keystore exists
-	// no => createkeystore
-	// synckeys
 	hasKeystore, err := HasKeystore()
 	if err != nil {
-		log.Fatal(err)
+		LOG.WithFields(logrus.Fields{
+			"error": err,
+		}).Fatal("Could not access keystore")
 	}
 	if hasKeystore == false {
 
@@ -185,11 +132,27 @@ func login() {
 		fmt.Println("<vcn> will now do this for you and upload the public key to the platform.")
 
 		color.Set(StyleAffordance())
-		fmt.Print("Attention: Please pick a strong password. There is no recovery possible.")
+		fmt.Print("Attention: Please pick a strong passphrase. There is no recovery possible.")
 		color.Unset()
 		fmt.Println()
 
-		keystorePassphrase, _ := readPassword("Keystore passphrase: ")
+		match := false
+		var keystorePassphrase string
+
+		for match == false {
+
+			keystorePassphrase, _ = readPassword("Keystore passphrase: ")
+
+			keystorePassphrase2, _ := readPassword("Keystore passphrase (reenter): ")
+
+			if keystorePassphrase == "" {
+				fmt.Println("Your passphrase must not be empty.")
+			} else if keystorePassphrase != keystorePassphrase2 {
+				fmt.Println("Your two inputs did not match. Please try again.")
+			} else {
+				match = true
+			}
+		}
 
 		pubKey, wallet := CreateKeystore(keystorePassphrase)
 
@@ -201,6 +164,7 @@ func login() {
 	SyncKeys()
 
 	fmt.Println("Login successful.")
+
 }
 
 // Commit => "sign"

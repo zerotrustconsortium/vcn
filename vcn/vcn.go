@@ -41,11 +41,11 @@ func main() {
 		LOG.SetLevel(logrus.DebugLevel)
 	case "INFO":
 		LOG.SetLevel(logrus.InfoLevel)
-	case "WARN":
+	case "WARN": // use this for api errors
 		LOG.SetLevel(logrus.WarnLevel)
 	case "ERROR":
 		LOG.SetLevel(logrus.ErrorLevel)
-	case "FATAL":
+	case "FATAL": // results in exit code > 0
 		LOG.SetLevel(logrus.FatalLevel)
 	case "PANIC":
 		LOG.SetLevel(logrus.PanicLevel)
@@ -111,8 +111,7 @@ func main() {
 		{
 			Category: "User actions",
 			Name:     "login",
-			Aliases:  []string{"a"},
-			Usage:    "Initial sign-up and subsequent sign-in",
+			Usage:    "Sign-in to vChain.us",
 			Action: func(c *cli.Context) error {
 
 				login()

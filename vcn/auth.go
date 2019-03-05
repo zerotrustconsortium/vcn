@@ -13,9 +13,9 @@ import (
 	"log"
 	"os"
 	"strings"
-	"time"
 
 	"github.com/dghubble/sling"
+	"github.com/sirupsen/logrus"
 )
 
 type AuthRequest struct {
@@ -82,7 +82,6 @@ func CheckToken(token string) (ret bool) {
 	}
 
 	restError := new(Error)
-	//response := new(PublisherResponse)
 
 	r, err := sling.New().
 		Get(TokenCheckEndpoint()).
@@ -90,15 +89,20 @@ func CheckToken(token string) (ret bool) {
 		Receive(nil, restError)
 
 	if err != nil {
-		// TODO DEBUG LEVEL
-		//fmt.Printf(err.Error())
+		LOG.WithFields(logrus.Fields{
+			"error": err,
+		}).Debug("Token invalid")
 		return false
 	}
 	switch r.StatusCode {
 	case 403:
-		fmt.Println("Token not found")
+		LOG.WithFields(logrus.Fields{
+			"error": err,
+		}).Error("Token not found")
 	case 419:
-		fmt.Println("Token expired")
+		LOG.WithFields(logrus.Fields{
+			"error": err,
+		}).Error("Token expired")
 	case 200:
 		return true
 	}
@@ -119,9 +123,12 @@ func Authenticate(email string, password string) (ret bool, code int) {
 		log.Fatal(err)
 	}
 	if r.StatusCode != 200 {
-		// TODO: DEBUG LOG LEVEL
-		fmt.Printf("request failed: %s (%d)\n", authError.Message,
-			authError.Status)
+
+		LOG.WithFields(logrus.Fields{
+			"code":  r.StatusCode,
+			"error": authError.Message,
+		}).Error("API request failed")
+
 		return false, authError.Status
 
 	}
@@ -133,37 +140,6 @@ func Authenticate(email string, password string) (ret bool, code int) {
 
 	return true, 0
 
-}
-
-func CheckPublisherIsVerified(token string) (ret bool, status int) {
-
-	restError := new(Error)
-	response := new(PublisherResponse)
-
-	r, err := sling.New().
-		Get(PublisherEndpoint()).
-		Add("Authorization", "Bearer "+token).
-		Receive(&response, restError)
-
-	if err != nil {
-		// TODO DEBUG LEVEL
-		//fmt.Printf(err.Error())
-		return false, 500
-	}
-	if r.StatusCode != 200 {
-
-		fmt.Printf(fmt.Sprintf("request failed: %s (%d)",
-			restError.Message, restError.Status))
-		return false, restError.Status
-	}
-
-	for _, el := range response.Authorities {
-		if el == ROLE_CONFIRMED_USER() {
-			return true, 0
-		}
-	}
-
-	return false, 404
 }
 
 // Register creates an Account with vChain.us
@@ -187,21 +163,6 @@ func Register(email string, accountPassword string) (ret bool, code int) {
 		return false, authError.Status
 	}
 	return true, 0
-}
-
-func WaitForConfirmation(token string, maxRounds uint64,
-	pollInterval time.Duration) error {
-
-	for i := uint64(0); i < maxRounds; i++ {
-
-		verified, _ := CheckPublisherIsVerified(token)
-
-		if verified == true {
-			return nil
-		}
-		//return fmt.Errorf("wait for confirmation failed: %s", err)
-	}
-	return fmt.Errorf("confirmation timed out")
 }
 
 func LoadToken() (jwtToken string, err error) {

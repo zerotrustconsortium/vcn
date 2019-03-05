@@ -28,11 +28,7 @@ type PagedWalletResponse struct {
 
 func CreateKeystore(password string) (pubKey string, wallet string) {
 	if password == "" {
-		var err error
-		password, err = readPassword("Keystore passphrase:")
-		if err != nil {
-			log.Fatal(err)
-		}
+		LOG.Error("Keystore passphrase cannot be empty")
 	}
 	ks := keystore.NewKeyStore(WalletDirectory(), keystore.StandardScryptN, keystore.StandardScryptP)
 	account, err := ks.NewAccount(password)
