@@ -114,6 +114,7 @@ func CheckPublisherExists(email string) (ret bool) {
 func CheckToken(token string) (ret bool) {
 
 	if token == "" {
+		LOG.Debug("Token not provided")
 		return false
 	}
 
@@ -148,6 +149,9 @@ func CheckToken(token string) (ret bool) {
 
 func Authenticate(email string, password string) (ret bool, code int) {
 
+	if password == "" {
+		return false, 401
+	}
 	token := new(TokenResponse)
 	authError := new(Error)
 
@@ -156,6 +160,7 @@ func Authenticate(email string, password string) (ret bool, code int) {
 		BodyJSON(AuthRequest{Email: email, Password: password}).
 		Receive(token, authError)
 	if err != nil {
+
 		log.Fatal(err)
 	}
 	if r.StatusCode != 200 {
@@ -171,6 +176,7 @@ func Authenticate(email string, password string) (ret bool, code int) {
 	err = ioutil.WriteFile(TokenFile(), []byte(token.Token),
 		os.FileMode(0600))
 	if err != nil {
+
 		log.Fatal(err)
 	}
 

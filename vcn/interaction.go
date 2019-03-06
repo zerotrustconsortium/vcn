@@ -39,7 +39,12 @@ func dashboard() {
 	browser.OpenURL(url)
 }
 
-func login() {
+func login(in *os.File) {
+	if in == nil {
+		in = os.Stdin
+	}
+	reader := bufio.NewReader(in)
+
 	// file system: token exists && api: token is valid
 	// no => enter email
 	//        api: publisher exists
@@ -56,10 +61,13 @@ func login() {
 
 	if tokenValid == false {
 
-		reader := bufio.NewReader(os.Stdin)
 		fmt.Print("Email address: ")
 		email, _ := reader.ReadString('\n')
 		email = strings.TrimSuffix(email, "\n")
+
+		LOG.WithFields(logrus.Fields{
+			"email": email,
+		}).Trace("Email entered")
 
 		publisherExists := CheckPublisherExists(email)
 
@@ -85,13 +93,24 @@ func login() {
 					os.Exit(1)
 				}
 
+				// handle not-displayed password via STDIN
+				// as well as file input for automated tests
+				var passwordString string
 				fmt.Printf("Password%s: ", attempt)
-				password, _ := terminal.ReadPassword(int(syscall.Stdin))
-				passwordString := string(password)
-				fmt.Println("")
+				if terminal.IsTerminal(syscall.Stdin) {
+					password, _ := terminal.ReadPassword(int(syscall.Stdin))
+					passwordString = string(password)
+					fmt.Println("")
+				} else {
+
+					passwordString, _ = reader.ReadString('\n')
+					passwordString = strings.TrimSuffix(passwordString, "\n")
+
+				}
 
 				returnCode := 0
 				authenticated, returnCode = Authenticate(email, passwordString)
+
 				if returnCode > 0 {
 
 					if returnCode == 401 {
@@ -106,6 +125,7 @@ func login() {
 						}).Fatal("API request failed: Email not confirmed.")
 					}
 				}
+
 			}
 
 		} else {
@@ -123,13 +143,16 @@ func login() {
 	// track successful login as early as possible
 	// fire a go routine for the tracking that shall not delay the main user interaction
 	WG.Add(1)
+	if token == "" {
+		token, _ = LoadToken()
+	}
 	go loginTracker(token)
 
 	hasKeystore, err := HasKeystore()
 	if err != nil {
 		LOG.WithFields(logrus.Fields{
 			"error": err,
-		}).Fatal("Could not access keystore")
+		}).Fatal("Could not access keystore directory")
 	}
 	if hasKeystore == false {
 
@@ -141,14 +164,35 @@ func login() {
 		color.Unset()
 		fmt.Println()
 
-		match := false
 		var keystorePassphrase string
+		var keystorePassphrase2 string
 
+		match := false
+		counter := 0
 		for match == false {
 
-			keystorePassphrase, _ = readPassword("Keystore passphrase: ")
+			counter++
 
-			keystorePassphrase2, _ := readPassword("Keystore passphrase (reenter): ")
+			if counter == 4 {
+				fmt.Println("Too many attempts failed.")
+				PrintErrorURLCustom("password", 404)
+				os.Exit(1)
+
+			}
+
+			if terminal.IsTerminal(syscall.Stdin) {
+
+				keystorePassphrase, _ = readPassword("Keystore passphrase: ")
+				keystorePassphrase2, _ = readPassword("Keystore passphrase (reenter): ")
+				fmt.Println("")
+			} else {
+
+				keystorePassphrase, _ = reader.ReadString('\n')
+				keystorePassphrase = strings.TrimSuffix(keystorePassphrase, "\n")
+
+				keystorePassphrase2, _ = reader.ReadString('\n')
+				keystorePassphrase2 = strings.TrimSuffix(keystorePassphrase2, "\n")
+			}
 
 			if keystorePassphrase == "" {
 				fmt.Println("Your passphrase must not be empty.")
@@ -157,6 +201,7 @@ func login() {
 			} else {
 				match = true
 			}
+
 		}
 
 		pubKey, wallet := CreateKeystore(keystorePassphrase)

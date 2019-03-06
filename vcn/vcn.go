@@ -114,7 +114,7 @@ func main() {
 			Usage:    "Sign-in to vChain.us",
 			Action: func(c *cli.Context) error {
 
-				login()
+				login(nil)
 				return nil
 			},
 		},

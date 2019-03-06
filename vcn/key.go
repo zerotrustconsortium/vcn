@@ -15,6 +15,7 @@ import (
 
 	"github.com/dghubble/sling"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
+	"github.com/sirupsen/logrus"
 )
 
 type Wallet struct {
@@ -43,8 +44,16 @@ func CreateKeystore(password string) (pubKey string, wallet string) {
 }
 
 func HasKeystore() (bool, error) {
+
+	LOG.WithFields(logrus.Fields{
+		"keystore": WalletDirectory(),
+	}).Trace("HasKeystore()")
+
 	files, err := ioutil.ReadDir(WalletDirectory())
 	if err != nil {
+		LOG.WithFields(logrus.Fields{
+			"error": err,
+		}).Error("ReadDir() failed")
 		return false, err
 	}
 	return len(files) > 0, nil
@@ -104,6 +113,10 @@ func SyncKeys() {
 		log.Fatalf("request failed: %s (%d)", authError.Message,
 			authError.Status)
 	}
+
+	// TODO: tracking key added
+	//fmt.Println(">>>>>>>>>> WILL ADD KEY ADDED HERE")
+
 }
 
 func PublicKeyForLocalWallet() (string, error) {
