@@ -45,6 +45,7 @@ $> vcn
 Alternatively you can build `vcn` in the working directory.
 
 ```
+$> go get ./...
 $> go build
 $> ./vcn
 ```
