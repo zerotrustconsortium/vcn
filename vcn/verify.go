@@ -21,7 +21,7 @@ import (
 )
 
 type ArtifactVerifyTrackerRequest struct {
-	Client   string `json:"type"`
+	Client   string `json:"client"`
 	Filename string `json:"filename"`
 	Hash     string `json:"hash"`
 	Url      string `json:"url"`
