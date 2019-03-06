@@ -2,7 +2,7 @@ version: '3.7'
 services:
   vcn:
     image: golang:1.12-stretch
-    entrypoint: "sh -c 'mkdir -p /go/bin && cd /app/vcn && go clean && go get -v && go get -t 'bou.ke/monkey' && go build -v && go test -v'"
+    entrypoint: "sh -c 'mkdir -p /go/bin && cd /app/vcn && go clean && go get -v && go get -t 'bou.ke/monkey' && go build -v && LOG_LEVEL=TRACE go test -v'"
     environment:
       GOPATH: /go
       GOBIN: /go/bin
