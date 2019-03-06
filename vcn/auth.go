@@ -56,7 +56,9 @@ func publisherEventTracker(event string) {
 
 	token, err := LoadToken()
 	if err != nil {
-		LOG.Error("Could not load token")
+		LOG.WithFields(logrus.Fields{
+			"event": event,
+		}).Error("Could not load token. (maybe it's an anonymous verify)")
 	}
 
 	LOG.Trace("publisherEventTracker() started")

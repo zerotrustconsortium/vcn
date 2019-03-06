@@ -24,7 +24,7 @@ const USER = "mathias@vchain.us"
 const PASSWORD = "***"
 const PASSPHRASE = "WHATEVER"
 
-func TestLoginVerifiedUser(t *testing.T) {
+func IgnoreTestLoginVerifiedUser(t *testing.T) {
 
 	// fmt.Println(VcnDirectory())
 

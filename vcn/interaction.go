@@ -292,6 +292,9 @@ func Sign(filename string, owner string) {
 
 	go displayLatency()
 
+	WG.Add(1)
+	go publisherEventTracker("VCN_SIGN")
+
 	// TODO: return and display: block #, trx #
 	commitHash(artifactHash, owner, string(passphrase), filename)
 	fmt.Println("")
@@ -299,14 +302,22 @@ func Sign(filename string, owner string) {
 	fmt.Println("Hash:\t\t", artifactHash)
 	fmt.Println("Date:\t\t", time.Now())
 	fmt.Println("Signer:\t\t", owner)
+
+	WG.Wait()
 }
 
 // VerifyAll => main entry point from cli
 // unwraps potential list input for verify()
 func VerifyAll(files []string) {
+
+	WG.Add(1)
+	go publisherEventTracker("VCN_VERIFY")
+
 	for _, file := range files {
 		verify(file)
 	}
+
+	WG.Wait()
 }
 func verify(filename string) {
 
