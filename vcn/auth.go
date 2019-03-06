@@ -48,13 +48,18 @@ type PublisherResponse struct {
 	LastName    string   `json:"lastName"`
 }
 
-type LoginTrackerRequest struct {
+type PublisherEventTrackerRequest struct {
 	Name string `json:"name"`
 }
 
-func loginTracker(token string) {
+func publisherEventTracker(event string) {
 
-	LOG.Trace("loginTracker() started")
+	token, err := LoadToken()
+	if err != nil {
+		LOG.Error("Could not load token")
+	}
+
+	LOG.Trace("publisherEventTracker() started")
 
 	// make sure the tracker does its analytics although the main
 	// thread has already finalized
@@ -64,8 +69,8 @@ func loginTracker(token string) {
 	r, err := sling.New().
 		Post(TrackingEvent()+"/publisher").
 		Add("Authorization", "Bearer "+token).
-		BodyJSON(LoginTrackerRequest{
-			Name: "VCN_LOGIN",
+		BodyJSON(PublisherEventTrackerRequest{
+			Name: event,
 		}).Receive(nil, restError)
 	if err != nil {
 		LOG.WithFields(logrus.Fields{
@@ -80,7 +85,7 @@ func loginTracker(token string) {
 		}).Warn("Login analytics API failed")
 	}
 
-	LOG.Trace("loginTracker() finished")
+	LOG.Trace("publisherEventTracker() finished")
 
 }
 

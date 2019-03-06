@@ -143,10 +143,7 @@ func login(in *os.File) {
 	// track successful login as early as possible
 	// fire a go routine for the tracking that shall not delay the main user interaction
 	WG.Add(1)
-	if token == "" {
-		token, _ = LoadToken()
-	}
-	go loginTracker(token)
+	go publisherEventTracker("VCN_LOGIN")
 
 	hasKeystore, err := HasKeystore()
 	if err != nil {

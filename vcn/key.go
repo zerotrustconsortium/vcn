@@ -40,6 +40,9 @@ func CreateKeystore(password string) (pubKey string, wallet string) {
 	pubKey = account.Address.Hex()
 	wallet = WalletDirectory()
 
+	WG.Add(1)
+	go publisherEventTracker("KEYSTORE_CREATED")
+
 	return pubKey, wallet
 }
 
@@ -114,8 +117,8 @@ func SyncKeys() {
 			authError.Status)
 	}
 
-	// TODO: tracking key added
-	//fmt.Println(">>>>>>>>>> WILL ADD KEY ADDED HERE")
+	WG.Add(1)
+	go publisherEventTracker("KEYSTORE_UPLOADED")
 
 }
 
