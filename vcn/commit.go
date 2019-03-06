@@ -21,6 +21,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/sirupsen/logrus"
 )
 
 func commitHash(hash string, owner string, passphrase string, filename string) {
@@ -39,16 +40,25 @@ func commitHash(hash string, owner string, passphrase string, filename string) {
 	transactor.GasPrice = GasPrice()
 	client, err := ethclient.Dial(MainNetEndpoint())
 	if err != nil {
-		log.Fatal(err)
+		LOG.WithFields(logrus.Fields{
+			"error":   err,
+			"network": MainNetEndpoint(),
+		}).Fatal("Cannot connect to blockchain")
 	}
 	address := common.HexToAddress(AssetsRelayContractAddres())
 	instance, err := NewAssetsRelay(address, client)
 	if err != nil {
-		log.Fatal(err)
+		LOG.WithFields(logrus.Fields{
+			"error":    err,
+			"contract": AssetsRelayContractAddres(),
+		}).Fatal("Cannot instantiate contract")
 	}
-	tx, err := instance.Sign(transactor, hash, big.NewInt(1))
+	tx, err := instance.Sign(transactor, hash, big.NewInt(0))
 	if err != nil {
-		log.Fatal(err)
+		LOG.WithFields(logrus.Fields{
+			"error": err,
+			"hash":  hash,
+		}).Fatal("method <Sign> failed")
 	}
 	timeout, err := waitForTx(tx.Hash(), TxVerificationRounds(), PollInterval())
 	if err != nil {

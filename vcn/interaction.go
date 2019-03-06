@@ -323,6 +323,18 @@ func verify(filename string) {
 
 	var artifactHash string
 
+	levels := map[int]string{
+		-1: "DISABLED",
+		0:  "UNKNOWN",
+		1:  "VERIFIED",
+		2:  "EXTENDED",
+	}
+	statuses := map[int]string{
+		0: "OK",
+		1: "UNSUPPORTED",
+		2: "UNTRUSTED",
+	}
+
 	// TODO: make this switch available for all functions
 	if strings.HasPrefix(filename, "docker:") {
 
@@ -341,8 +353,8 @@ func verify(filename string) {
 
 	fmt.Println("File:\t", filename)
 	fmt.Println("Hash:\t", artifactHash)
-	fmt.Println("Level:\t", level)
-	fmt.Println("Status:\t", status)
+	fmt.Println("Level:\t", levels[int(level)])
+	fmt.Println("Status:\t", statuses[int(status)])
 	if timestamp != 0 {
 		fmt.Println("Date:\t", time.Unix(timestamp, 0))
 	}

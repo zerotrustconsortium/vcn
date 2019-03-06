@@ -12,7 +12,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"math/big"
 
 	"github.com/dghubble/sling"
@@ -36,7 +35,7 @@ func artifactTracker(hash string) {
 
 	restError := new(Error)
 	r, err := sling.New().
-		Post(TrackingEvent() + "/verify").
+		Post(TrackingEvent()+"/verify").
 		//Add("Authorization", "Bearer "+token).
 		BodyJSON(ArtifactVerifyTrackerRequest{
 			Client: "VCN:" + VCN_VERSION,
@@ -63,16 +62,25 @@ func artifactTracker(hash string) {
 func verifyHash(hash string) (verified bool, owner string, level int64, status int64, timestamp int64) {
 	client, err := ethclient.Dial(MainNetEndpoint())
 	if err != nil {
-		log.Fatal(err)
+		LOG.WithFields(logrus.Fields{
+			"error":   err,
+			"network": MainNetEndpoint(),
+		}).Fatal("Cannot connect to blockchain")
 	}
 	address := common.HexToAddress(AssetsRelayContractAddres())
 	instance, err := NewAssetsRelay(address, client)
 	if err != nil {
-		log.Fatal(err)
+		LOG.WithFields(logrus.Fields{
+			"error":    err,
+			"contract": AssetsRelayContractAddres(),
+		}).Fatal("Cannot instantiate contract")
 	}
 	address, l, s, ts, err := instance.Verify(nil, hash)
 	if err != nil {
-		log.Fatal(err)
+		LOG.WithFields(logrus.Fields{
+			"error": err,
+			"hash":  hash,
+		}).Fatal("method <Verify> failed")
 	}
 	return address != common.BigToAddress(big.NewInt(0)),
 		address.Hex(),
