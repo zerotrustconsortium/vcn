@@ -26,7 +26,7 @@ const PASSPHRASE = "WHATEVER"
 
 func TestLoginVerifiedUser(t *testing.T) {
 
-	//fmt.Println(VcnDirectory())
+	// fmt.Println(VcnDirectory())
 
 	tdir, err := ioutil.TempDir("", "vcn-testing")
 	if err != nil {
@@ -43,7 +43,7 @@ func TestLoginVerifiedUser(t *testing.T) {
 
 	createDirectoryInfrastructure()
 
-	//fmt.Println(VcnDirectory())
+	// fmt.Println(VcnDirectory())
 
 	in, err := ioutil.TempFile("", "")
 	if err != nil {

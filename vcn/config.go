@@ -66,6 +66,10 @@ func ProofContractAddress() string {
 	return "0x66ccf074254cb0eb8d9e8020d8e777406a1d9cbb"
 }
 
+func AssetsRelayContractAddres() string {
+	return "0xf1d4b9fe8290bb5718db5d46c313e7b266570c21"
+}
+
 func TxVerificationRounds() uint64 {
 	return 10
 }

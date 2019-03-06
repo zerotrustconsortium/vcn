@@ -13,6 +13,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"math/big"
 
 	"github.com/dghubble/sling"
 	"github.com/ethereum/go-ethereum/common"
@@ -35,7 +36,7 @@ func artifactTracker(hash string) {
 
 	restError := new(Error)
 	r, err := sling.New().
-		Post(TrackingEvent()+"/verify").
+		Post(TrackingEvent() + "/verify").
 		//Add("Authorization", "Bearer "+token).
 		BodyJSON(ArtifactVerifyTrackerRequest{
 			Client: "VCN:" + VCN_VERSION,
@@ -59,21 +60,23 @@ func artifactTracker(hash string) {
 
 }
 
-func verifyHash(hash string) (verified bool, owner string, timestamp int64) {
-
+func verifyHash(hash string) (verified bool, owner string, level int64, status int64, timestamp int64) {
 	client, err := ethclient.Dial(MainNetEndpoint())
 	if err != nil {
 		log.Fatal(err)
 	}
-	address := common.HexToAddress(ProofContractAddress())
-	instance, err := NewProof(address, client)
+	address := common.HexToAddress(AssetsRelayContractAddres())
+	instance, err := NewAssetsRelay(address, client)
 	if err != nil {
 		log.Fatal(err)
 	}
-	artifact, err := instance.Get(nil, hash)
+	address, l, s, ts, err := instance.Verify(nil, hash)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	return artifact.Owner != "", artifact.Owner, artifact.Timestamp.Int64()
+	return address != common.BigToAddress(big.NewInt(0)),
+		address.Hex(),
+		l.Int64(),
+		s.Int64(),
+		ts.Int64()
 }

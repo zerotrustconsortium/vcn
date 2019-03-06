@@ -14,6 +14,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math/big"
 	"os"
 	"time"
 
@@ -29,7 +30,7 @@ func commitHash(hash string, owner string, passphrase string, filename string) {
 	}
 	transactor, err := bind.NewTransactor(reader, passphrase)
 	if err != nil {
-		//log.Fatal(err)
+		// log.Fatal(err)
 		fmt.Printf("\n%s\n", err.Error())
 		PrintErrorURLCustom("sign", 401)
 		os.Exit(1)
@@ -40,12 +41,12 @@ func commitHash(hash string, owner string, passphrase string, filename string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	address := common.HexToAddress(ProofContractAddress())
-	instance, err := NewProof(address, client)
+	address := common.HexToAddress(AssetsRelayContractAddres())
+	instance, err := NewAssetsRelay(address, client)
 	if err != nil {
 		log.Fatal(err)
 	}
-	tx, err := instance.Set(transactor, owner, hash)
+	tx, err := instance.Sign(transactor, hash, big.NewInt(1))
 	if err != nil {
 		log.Fatal(err)
 	}

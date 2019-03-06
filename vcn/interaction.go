@@ -226,7 +226,7 @@ func Sign(filename string, owner string) {
 	if token == "" {
 		fmt.Println("You need to be logged in to sign.")
 		fmt.Println("Proceed by authenticating yourself using <vcn auth>")
-		//PrintErrorURLCustom("token", 428)
+		// PrintErrorURLCustom("token", 428)
 		os.Exit(1)
 	}
 
@@ -235,7 +235,7 @@ func Sign(filename string, owner string) {
 	if hasKeystore == false {
 		fmt.Printf("You need a keystore to sign.\n")
 		fmt.Println("Proceed by authenticating yourself using <vcn auth>")
-		//PrintErrorURLCustom("keystore", 428)
+		// PrintErrorURLCustom("keystore", 428)
 		os.Exit(1)
 	}
 
@@ -245,8 +245,8 @@ func Sign(filename string, owner string) {
 	if strings.HasPrefix(filename, "docker:") {
 
 		artifactHash = getDockerHash(filename)
-		//fmt.Printf("Docker: Not yet implemented\n")
-		//os.Exit(1)
+		// fmt.Printf("Docker: Not yet implemented\n")
+		// os.Exit(1)
 
 	} else if strings.HasPrefix(filename, "git:") {
 		fmt.Printf("git: Not yet implemented\n")
@@ -316,8 +316,8 @@ func verify(filename string) {
 	if strings.HasPrefix(filename, "docker:") {
 
 		artifactHash = getDockerHash(filename)
-		//fmt.Printf("Docker: Not yet implemented\n")
-		//os.Exit(1)
+		// fmt.Printf("Docker: Not yet implemented\n")
+		// os.Exit(1)
 	} else {
 		artifactHash = strings.TrimSpace(hash(filename))
 	}
@@ -326,10 +326,12 @@ func verify(filename string) {
 	WG.Add(1)
 	go artifactTracker(artifactHash)
 
-	verified, owner, timestamp := verifyHash(artifactHash)
+	verified, owner, level, status, timestamp := verifyHash(artifactHash)
 
 	fmt.Println("File:\t", filename)
 	fmt.Println("Hash:\t", artifactHash)
+	fmt.Println("Level:\t", level)
+	fmt.Println("Status:\t", status)
 	if timestamp != 0 {
 		fmt.Println("Date:\t", time.Unix(timestamp, 0))
 	}
