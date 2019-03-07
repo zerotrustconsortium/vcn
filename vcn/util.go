@@ -151,3 +151,36 @@ func getDockerHash(param string) (hash string) {
 
 	return dockerHashStr
 }
+
+func getLevelName(level int) (name string) {
+	switch level {
+	case int(UNKNOWN):
+		return "UNKNOWN"
+	case int(EMAIL_VERIFIED):
+		return "EMAIL_VERIFIED"
+	case int(SOCIAL_VERIFIED):
+		return "SOCIAL_VERIFIED"
+	case int(ID_VERIFIED):
+		return "ID_VERIFIED"
+	case int(LOCATION_VERIFIED):
+		return "LOCATION_VERIFIED"
+	case int(VCHAIN):
+		return "VCHAIN"
+	default:
+		return "UNKNOWN"
+	}
+}
+func getStatusName(status int) (name string) {
+
+	switch status {
+	case int(OK):
+		return "OK"
+	case int(UNSUPPORTED):
+		return "UNSUPPORTED"
+	case int(UNTRUSTED):
+		return "UNTRUSTED"
+	default:
+		return "UNTRUSTED"
+	}
+
+}

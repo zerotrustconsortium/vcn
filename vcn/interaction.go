@@ -296,11 +296,11 @@ func Sign(filename string, state Status) {
 	go publisherEventTracker("VCN_SIGN")
 
 	// TODO: return and display: block #, trx #
-	commitHash(artifactHash, string(passphrase), filename)
+	_, _ = commitHash(artifactHash, string(passphrase), filename, state)
 	fmt.Println("")
 	fmt.Println("Artifact:\t\t", filename)
 	fmt.Println("Hash:\t\t", artifactHash)
-	fmt.Println("Date:\t\t", time.Now())
+	//fmt.Println("Date:\t\t", time.Now())
 	fmt.Println("Signer:\t\t", "<pubKey>")
 
 	WG.Wait()
@@ -338,11 +338,14 @@ func verify(filename string) {
 	go artifactTracker(artifactHash)
 
 	verified, owner, level, status, timestamp := verifyHash(artifactHash)
-	fmt.Println(level, status)
-	fmt.Println("File:\t", filename)
+
+	LOG.WithFields(logrus.Fields{
+		"verified": verified,
+	}).Debug("verifyHash()")
+
+	fmt.Println("Asset:\t", filename)
 	fmt.Println("Hash:\t", artifactHash)
-	//fmt.Println("Level:\t", LEVELS[int(level)])
-	//fmt.Println("Status:\t", STATUSES[int(status)])
+
 	if timestamp != 0 {
 		fmt.Println("Date:\t", time.Unix(timestamp, 0))
 	}
@@ -350,16 +353,18 @@ func verify(filename string) {
 		fmt.Println("Signer:\t", owner)
 	}
 
-	fmt.Print("Trust:\t")
-	if verified {
-		color.Set(color.FgHiWhite, color.BgCyan, color.Bold)
-		fmt.Print("VERIFIED")
+	fmt.Println("Level:\t", getLevelName(int(level)))
+
+	fmt.Print("Status:\t ")
+	if status == int64(OK) {
+		color.Set(StyleSuccess())
 	} else {
-		color.Set(color.FgHiWhite, color.BgMagenta, color.Bold)
-		fmt.Print("UNKNOWN")
+		color.Set(StyleError())
 		defer os.Exit(1)
 	}
+	fmt.Print(getStatusName(int(status)))
 	color.Unset()
+
 	fmt.Println()
 
 	// wait for the asset tracker to put data to analytics

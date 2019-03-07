@@ -24,7 +24,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func commitHash(hash string, passphrase string, filename string) {
+func commitHash(hash string, passphrase string, filename string, status Status) (ret bool, code int) {
 	reader, err := firstFile(WalletDirectory())
 	if err != nil {
 		log.Fatal(err)
@@ -53,7 +53,7 @@ func commitHash(hash string, passphrase string, filename string) {
 			"contract": AssetsRelayContractAddres(),
 		}).Fatal("Cannot instantiate contract")
 	}
-	tx, err := instance.Sign(transactor, hash, big.NewInt(0))
+	tx, err := instance.Sign(transactor, hash, big.NewInt(int64(status)))
 	if err != nil {
 		LOG.WithFields(logrus.Fields{
 			"error": err,
@@ -75,6 +75,8 @@ func commitHash(hash string, passphrase string, filename string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	return true, 0
 }
 
 func waitForTx(tx common.Hash, maxRounds uint64, pollInterval time.Duration) (timeout bool, err error) {

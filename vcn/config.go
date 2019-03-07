@@ -44,6 +44,9 @@ func StyleAffordance() (color.Attribute, color.Attribute, color.Attribute) {
 func StyleError() (color.Attribute, color.Attribute, color.Attribute) {
 	return color.FgHiRed, color.BgHiWhite, color.Bold
 }
+func StyleSuccess() (color.Attribute, color.Attribute, color.Attribute) {
+	return color.FgHiWhite, color.BgHiCyan, color.Bold
+}
 func ErrorWikiURL() string {
 	return "https://github.com/vchain-us/vcn/wiki/Errors#"
 }
