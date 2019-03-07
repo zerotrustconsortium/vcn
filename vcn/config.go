@@ -18,6 +18,26 @@ import (
 	"github.com/fatih/color"
 )
 
+type Level int
+
+const (
+	DISABLED          Level = -1
+	UNKNOWN           Level = 0
+	EMAIL_VERIFIED    Level = 1
+	SOCIAL_VERIFIED   Level = 2
+	ID_VERIFIED       Level = 3
+	LOCATION_VERIFIED Level = 4
+	VCHAIN            Level = 99
+)
+
+type Status int
+
+const (
+	OK          Status = 0
+	UNSUPPORTED Status = 1
+	UNTRUSTED   Status = 2
+)
+
 func StyleAffordance() (color.Attribute, color.Attribute, color.Attribute) {
 	return color.FgHiBlue, color.BgWhite, color.Bold
 }

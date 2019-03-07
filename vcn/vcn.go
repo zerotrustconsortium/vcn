@@ -26,7 +26,7 @@ import (
 var LOG = logrus.New()
 
 // VCN_VERSION sets the version for the build + some logging with analytics
-var VCN_VERSION = "0.2.2"
+var VCN_VERSION = "0.3.0"
 
 // WG waitgroup for sync of threads across the whole project
 var WG sync.WaitGroup
@@ -85,12 +85,25 @@ func main() {
 			Category: "Artifact actions",
 			Name:     "sign",
 			Aliases:  []string{"s"},
-			Usage:    "Sign commits and artifact's hash onto the blockchain",
+			Usage:    "Sign digital assets' hashes onto the blockchain",
 			Action: func(c *cli.Context) error {
 				if c.NArg() == 0 {
 					return fmt.Errorf("filename or type:reference required")
 				}
-				Sign(c.Args().First(), "me")
+				Sign(c.Args().First(), OK)
+				return nil
+			},
+		},
+		{
+			Category: "Artifact actions",
+			Name:     "untrust",
+			Aliases:  []string{"u"},
+			Usage:    "Untrust a digital asset.",
+			Action: func(c *cli.Context) error {
+				if c.NArg() == 0 {
+					return fmt.Errorf("filename or type:reference required")
+				}
+				Sign(c.Args().First(), UNTRUSTED)
 				return nil
 			},
 		},

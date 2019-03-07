@@ -24,7 +24,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func commitHash(hash string, owner string, passphrase string, filename string) {
+func commitHash(hash string, passphrase string, filename string) {
 	reader, err := firstFile(WalletDirectory())
 	if err != nil {
 		log.Fatal(err)

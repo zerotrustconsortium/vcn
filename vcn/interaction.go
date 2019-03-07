@@ -219,7 +219,7 @@ func login(in *os.File) {
 }
 
 // Commit => "sign"
-func Sign(filename string, owner string) {
+func Sign(filename string, state Status) {
 
 	// check for token
 	token, _ := LoadToken()
@@ -296,12 +296,12 @@ func Sign(filename string, owner string) {
 	go publisherEventTracker("VCN_SIGN")
 
 	// TODO: return and display: block #, trx #
-	commitHash(artifactHash, owner, string(passphrase), filename)
+	commitHash(artifactHash, string(passphrase), filename)
 	fmt.Println("")
 	fmt.Println("Artifact:\t\t", filename)
 	fmt.Println("Hash:\t\t", artifactHash)
 	fmt.Println("Date:\t\t", time.Now())
-	fmt.Println("Signer:\t\t", owner)
+	fmt.Println("Signer:\t\t", "<pubKey>")
 
 	WG.Wait()
 }
@@ -323,18 +323,6 @@ func verify(filename string) {
 
 	var artifactHash string
 
-	levels := map[int]string{
-		-1: "DISABLED",
-		0:  "UNKNOWN",
-		1:  "VERIFIED",
-		2:  "EXTENDED",
-	}
-	statuses := map[int]string{
-		0: "OK",
-		1: "UNSUPPORTED",
-		2: "UNTRUSTED",
-	}
-
 	// TODO: make this switch available for all functions
 	if strings.HasPrefix(filename, "docker:") {
 
@@ -350,11 +338,11 @@ func verify(filename string) {
 	go artifactTracker(artifactHash)
 
 	verified, owner, level, status, timestamp := verifyHash(artifactHash)
-
+	fmt.Println(level, status)
 	fmt.Println("File:\t", filename)
 	fmt.Println("Hash:\t", artifactHash)
-	fmt.Println("Level:\t", levels[int(level)])
-	fmt.Println("Status:\t", statuses[int(status)])
+	//fmt.Println("Level:\t", LEVELS[int(level)])
+	//fmt.Println("Status:\t", STATUSES[int(status)])
 	if timestamp != 0 {
 		fmt.Println("Date:\t", time.Unix(timestamp, 0))
 	}
