@@ -12,7 +12,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"math/big"
 	"os"
@@ -27,12 +26,15 @@ import (
 func commitHash(hash string, passphrase string, filename string, status Status) (ret bool, code int) {
 	reader, err := firstFile(WalletDirectory())
 	if err != nil {
-		log.Fatal(err)
+		LOG.WithFields(logrus.Fields{
+			"error": err,
+		}).Fatal("Could not load keystore")
 	}
 	transactor, err := bind.NewTransactor(reader, passphrase)
 	if err != nil {
-		// log.Fatal(err)
-		fmt.Printf("\n%s\n", err.Error())
+		LOG.WithFields(logrus.Fields{
+			"error": err,
+		}).Error("Could not load contract")
 		PrintErrorURLCustom("sign", 401)
 		os.Exit(1)
 	}
@@ -62,10 +64,16 @@ func commitHash(hash string, passphrase string, filename string, status Status) 
 	}
 	timeout, err := waitForTx(tx.Hash(), TxVerificationRounds(), PollInterval())
 	if err != nil {
-		log.Fatal(err)
+		LOG.WithFields(logrus.Fields{
+			"error": err,
+		}).Error("Could not write to blockchain")
+		PrintErrorURLCustom("blockchain-permission", 403)
+		os.Exit(1)
 	}
 	if timeout {
-		log.Fatal("transaction timed out")
+		LOG.WithFields(logrus.Fields{
+			"error": err,
+		}).Fatal("Writing to blockchain timed out")
 	}
 	publicKey, err := PublicKeyForLocalWallet()
 	if err != nil {

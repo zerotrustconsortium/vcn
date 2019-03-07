@@ -298,10 +298,10 @@ func Sign(filename string, state Status) {
 	// TODO: return and display: block #, trx #
 	_, _ = commitHash(artifactHash, string(passphrase), filename, state)
 	fmt.Println("")
-	fmt.Println("Artifact:\t\t", filename)
-	fmt.Println("Hash:\t\t", artifactHash)
+	fmt.Println("Asset:\t", filename)
+	fmt.Println("Hash:\t", artifactHash)
 	//fmt.Println("Date:\t\t", time.Now())
-	fmt.Println("Signer:\t\t", "<pubKey>")
+	//fmt.Println("Signer:\t", "<pubKey>")
 
 	WG.Wait()
 }

@@ -97,13 +97,26 @@ func main() {
 		{
 			Category: "Artifact actions",
 			Name:     "untrust",
-			Aliases:  []string{"u"},
+			Aliases:  []string{"ut"},
 			Usage:    "Untrust a digital asset.",
 			Action: func(c *cli.Context) error {
 				if c.NArg() == 0 {
 					return fmt.Errorf("filename or type:reference required")
 				}
 				Sign(c.Args().First(), UNTRUSTED)
+				return nil
+			},
+		},
+		{
+			Category: "Artifact actions",
+			Name:     "unsupport",
+			Aliases:  []string{"ut"},
+			Usage:    "Unsupport a digital asset.",
+			Action: func(c *cli.Context) error {
+				if c.NArg() == 0 {
+					return fmt.Errorf("filename or type:reference required")
+				}
+				Sign(c.Args().First(), UNSUPPORTED)
 				return nil
 			},
 		},
