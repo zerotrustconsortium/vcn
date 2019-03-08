@@ -38,27 +38,43 @@ const (
 	UNTRUSTED   Status = 2
 )
 
-func StyleAffordance() (color.Attribute, color.Attribute, color.Attribute) {
-	return color.FgHiBlue, color.BgWhite, color.Bold
-}
-func StyleError() (color.Attribute, color.Attribute, color.Attribute) {
-	return color.FgHiRed, color.BgHiWhite, color.Bold
-}
-func StyleSuccess() (color.Attribute, color.Attribute, color.Attribute) {
-	return color.FgHiWhite, color.BgHiCyan, color.Bold
-}
-func ErrorWikiURL() string {
-	return "https://github.com/vchain-us/vcn/wiki/Errors#"
-}
 func DashboardURL() string {
+	// production:  https://dashboard.vchain.us
+	// staging: 	https://dashboard.staging.vchain.us
 	return "https://dashboard.staging.vchain.us"
 }
 func MainNetEndpoint() string {
+	// production:  https://main.vchain.us
+	// staging: 	https://main.staging.vchain.us
 	return "https://main.staging.vchain.us"
 }
 
 func FoundationEndpoint() string {
+	// production: 	https://api.vchain.us/foundation
+	// staging: 	https://api.staging.vchain.us/foundation
 	return "https://api.staging.vchain.us/foundation"
+}
+
+func AssetsRelayContractAddress() string {
+	// production:  0x495021fe1a48a5b0c85ef1abd68c42cdfc7cda08
+	// staging: 	0xf1d4b9fe8290bb5718db5d46c313e7b266570c21
+	return "0xf1d4b9fe8290bb5718db5d46c313e7b266570c21"
+}
+
+func StyleAffordance() (color.Attribute, color.Attribute, color.Attribute) {
+	return color.FgHiBlue, color.BgWhite, color.Bold
+}
+
+func StyleError() (color.Attribute, color.Attribute, color.Attribute) {
+	return color.FgHiRed, color.BgHiWhite, color.Bold
+}
+
+func StyleSuccess() (color.Attribute, color.Attribute, color.Attribute) {
+	return color.FgHiWhite, color.BgHiCyan, color.Bold
+}
+
+func ErrorWikiURL() string {
+	return "https://github.com/vchain-us/vcn/wiki/Errors#"
 }
 
 func TrackingEvent() string {
@@ -73,24 +89,12 @@ func PublisherEndpoint() string {
 	return FoundationEndpoint() + "/v1/publisher"
 }
 
-func ROLE_CONFIRMED_USER() string {
-	return "ROLE_CONFIRMED_USER"
-}
-
 func WalletEndpoint() string {
 	return FoundationEndpoint() + "/v1/wallet"
 }
 
 func ArtifactEndpoint(walletAddress string) string {
 	return FoundationEndpoint() + "/v1/artifact?wallet-address=" + walletAddress
-}
-
-func ProofContractAddress() string {
-	return "0x66ccf074254cb0eb8d9e8020d8e777406a1d9cbb"
-}
-
-func AssetsRelayContractAddres() string {
-	return "0xf1d4b9fe8290bb5718db5d46c313e7b266570c21"
 }
 
 func TxVerificationRounds() uint64 {

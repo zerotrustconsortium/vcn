@@ -68,12 +68,12 @@ func verifyHash(hash string) (verified bool, owner string, level int64, status i
 			"network": MainNetEndpoint(),
 		}).Fatal("Cannot connect to blockchain")
 	}
-	address := common.HexToAddress(AssetsRelayContractAddres())
+	address := common.HexToAddress(AssetsRelayContractAddress())
 	instance, err := NewAssetsRelay(address, client)
 	if err != nil {
 		LOG.WithFields(logrus.Fields{
 			"error":    err,
-			"contract": AssetsRelayContractAddres(),
+			"contract": AssetsRelayContractAddress(),
 		}).Fatal("Cannot instantiate contract")
 	}
 	address, l, s, ts, err := instance.Verify(nil, hash)

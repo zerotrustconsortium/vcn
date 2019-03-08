@@ -47,7 +47,7 @@ func artifactCommitTracker(hash string, filename string, status Status) {
 
 	restError := new(Error)
 	r, err := sling.New().
-		Post(TrackingEvent()+"/sign").
+		Post(TrackingEvent() + "/sign").
 		Add("Authorization", "Bearer "+token).
 		BodyJSON(ArtifactCommitTrackerRequest{
 			Name:     getStatusName(int(status)),
@@ -96,12 +96,12 @@ func commitHash(hash string, passphrase string, filename string, status Status) 
 			"network": MainNetEndpoint(),
 		}).Fatal("Cannot connect to blockchain")
 	}
-	address := common.HexToAddress(AssetsRelayContractAddres())
+	address := common.HexToAddress(AssetsRelayContractAddress())
 	instance, err := NewAssetsRelay(address, client)
 	if err != nil {
 		LOG.WithFields(logrus.Fields{
 			"error":    err,
-			"contract": AssetsRelayContractAddres(),
+			"contract": AssetsRelayContractAddress(),
 		}).Fatal("Cannot instantiate contract")
 	}
 	tx, err := instance.Sign(transactor, hash, big.NewInt(int64(status)))
