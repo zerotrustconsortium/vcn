@@ -96,17 +96,19 @@ func login(in *os.File) {
 				// handle not-displayed password via STDIN
 				// as well as file input for automated tests
 				var passwordString string
+
 				fmt.Printf("Password%s: ", attempt)
-				if terminal.IsTerminal(syscall.Stdin) {
-					password, _ := terminal.ReadPassword(int(syscall.Stdin))
-					passwordString = string(password)
-					fmt.Println("")
-				} else {
+				// TODO: solution for reading from file inputs whose compilation does not fail on windows
+				//if terminal.IsTerminal(syscall.Stdin) {
+				password, _ := terminal.ReadPassword(int(syscall.Stdin))
+				passwordString = string(password)
+				fmt.Println("")
+				/*} else {
 
 					passwordString, _ = reader.ReadString('\n')
 					passwordString = strings.TrimSuffix(passwordString, "\n")
 
-				}
+				}*/
 
 				returnCode := 0
 				authenticated, returnCode = Authenticate(email, passwordString)
@@ -177,19 +179,20 @@ func login(in *os.File) {
 
 			}
 
-			if terminal.IsTerminal(syscall.Stdin) {
+			// TODO: solution for reading from file inputs whose compilation does not fail on windows
+			//if terminal.IsTerminal(syscall.Stdin) {
 
-				keystorePassphrase, _ = readPassword("Keystore passphrase: ")
-				keystorePassphrase2, _ = readPassword("Keystore passphrase (reenter): ")
-				fmt.Println("")
-			} else {
+			keystorePassphrase, _ = readPassword("Keystore passphrase: ")
+			keystorePassphrase2, _ = readPassword("Keystore passphrase (reenter): ")
+			fmt.Println("")
+			/*} else {
 
 				keystorePassphrase, _ = reader.ReadString('\n')
 				keystorePassphrase = strings.TrimSuffix(keystorePassphrase, "\n")
 
 				keystorePassphrase2, _ = reader.ReadString('\n')
 				keystorePassphrase2 = strings.TrimSuffix(keystorePassphrase2, "\n")
-			}
+			}*/
 
 			if keystorePassphrase == "" {
 				fmt.Println("Your passphrase must not be empty.")
@@ -294,6 +297,8 @@ func Sign(filename string, state Status) {
 
 	WG.Add(1)
 	go publisherEventTracker("VCN_SIGN")
+	WG.Add(1)
+	go artifactCommitTracker(artifactHash, filename, state)
 
 	// TODO: return and display: block #, trx #
 	_, _ = commitHash(artifactHash, string(passphrase), filename, state)
@@ -335,7 +340,7 @@ func verify(filename string) {
 
 	// fire a go routine for the tracking that shall not delay the main user interaction
 	WG.Add(1)
-	go artifactTracker(artifactHash)
+	go artifactVerifyTracker(artifactHash)
 
 	verified, owner, level, status, timestamp := verifyHash(artifactHash)
 

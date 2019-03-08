@@ -27,7 +27,7 @@ type ArtifactVerifyTrackerRequest struct {
 	Url      string `json:"url"`
 }
 
-func artifactTracker(hash string) {
+func artifactVerifyTracker(hash string) {
 
 	// make sure the tracker does its analytics although the main
 	// thread against the BC has already finalized
