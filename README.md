@@ -75,6 +75,13 @@ $> vcn sign <file>
 $> vcn sign docker:<image>
 ```
 
+Change the asset's status
+
+```
+$> vcn unsupport <file>
+$> vcn untrust <file>
+```
+
 Have a look at analytics and extended functionality on the dashboard (browser needed):
 
 ```
