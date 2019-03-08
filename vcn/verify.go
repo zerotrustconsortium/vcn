@@ -27,7 +27,7 @@ type ArtifactVerifyTrackerRequest struct {
 	Url      string `json:"url"`
 }
 
-func artifactVerifyTracker(hash string) {
+func artifactVerifyTracker(hash string, filename string) {
 
 	// make sure the tracker does its analytics although the main
 	// thread against the BC has already finalized
@@ -35,11 +35,12 @@ func artifactVerifyTracker(hash string) {
 
 	restError := new(Error)
 	r, err := sling.New().
-		Post(TrackingEvent()+"/verify").
+		Post(TrackingEvent() + "/verify").
 		//Add("Authorization", "Bearer "+token).
 		BodyJSON(ArtifactVerifyTrackerRequest{
-			Client: "VCN:" + VCN_VERSION,
-			Hash:   hash,
+			Client:   "VCN:" + VCN_VERSION,
+			Filename: filename,
+			Hash:     hash,
 		}).Receive(nil, restError)
 	if err != nil {
 		fmt.Println(err)

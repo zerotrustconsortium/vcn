@@ -99,7 +99,7 @@ func login(in *os.File) {
 
 				fmt.Printf("Password%s: ", attempt)
 				// TODO: solution for reading from file inputs whose compilation does not fail on windows
-				//if terminal.IsTerminal(syscall.Stdin) {
+				// if terminal.IsTerminal(syscall.Stdin) {
 				password, _ := terminal.ReadPassword(int(syscall.Stdin))
 				passwordString = string(password)
 				fmt.Println("")
@@ -180,7 +180,7 @@ func login(in *os.File) {
 			}
 
 			// TODO: solution for reading from file inputs whose compilation does not fail on windows
-			//if terminal.IsTerminal(syscall.Stdin) {
+			// if terminal.IsTerminal(syscall.Stdin) {
 
 			keystorePassphrase, _ = readPassword("Keystore passphrase: ")
 			keystorePassphrase2, _ = readPassword("Keystore passphrase (reenter): ")
@@ -305,8 +305,8 @@ func Sign(filename string, state Status) {
 	fmt.Println("")
 	fmt.Println("Asset:\t", filename)
 	fmt.Println("Hash:\t", artifactHash)
-	//fmt.Println("Date:\t\t", time.Now())
-	//fmt.Println("Signer:\t", "<pubKey>")
+	// fmt.Println("Date:\t\t", time.Now())
+	// fmt.Println("Signer:\t", "<pubKey>")
 
 	WG.Wait()
 }
@@ -340,7 +340,7 @@ func verify(filename string) {
 
 	// fire a go routine for the tracking that shall not delay the main user interaction
 	WG.Add(1)
-	go artifactVerifyTracker(artifactHash)
+	go artifactVerifyTracker(artifactHash, filename)
 
 	verified, owner, level, status, timestamp := verifyHash(artifactHash)
 
