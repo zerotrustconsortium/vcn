@@ -18,11 +18,34 @@ import (
 	"github.com/fatih/color"
 )
 
+type Level int
+
+const (
+	DISABLED          Level = -1
+	UNKNOWN           Level = 0
+	EMAIL_VERIFIED    Level = 1
+	SOCIAL_VERIFIED   Level = 2
+	ID_VERIFIED       Level = 3
+	LOCATION_VERIFIED Level = 4
+	VCHAIN            Level = 99
+)
+
+type Status int
+
+const (
+	OK          Status = 0
+	UNSUPPORTED Status = 1
+	UNTRUSTED   Status = 2
+)
+
 func StyleAffordance() (color.Attribute, color.Attribute, color.Attribute) {
 	return color.FgHiBlue, color.BgWhite, color.Bold
 }
 func StyleError() (color.Attribute, color.Attribute, color.Attribute) {
 	return color.FgHiRed, color.BgHiWhite, color.Bold
+}
+func StyleSuccess() (color.Attribute, color.Attribute, color.Attribute) {
+	return color.FgHiWhite, color.BgHiCyan, color.Bold
 }
 func ErrorWikiURL() string {
 	return "https://github.com/vchain-us/vcn/wiki/Errors#"
@@ -64,6 +87,10 @@ func ArtifactEndpoint(walletAddress string) string {
 
 func ProofContractAddress() string {
 	return "0x66ccf074254cb0eb8d9e8020d8e777406a1d9cbb"
+}
+
+func AssetsRelayContractAddres() string {
+	return "0xf1d4b9fe8290bb5718db5d46c313e7b266570c21"
 }
 
 func TxVerificationRounds() uint64 {

@@ -96,17 +96,19 @@ func login(in *os.File) {
 				// handle not-displayed password via STDIN
 				// as well as file input for automated tests
 				var passwordString string
+
 				fmt.Printf("Password%s: ", attempt)
-				if terminal.IsTerminal(syscall.Stdin) {
-					password, _ := terminal.ReadPassword(int(syscall.Stdin))
-					passwordString = string(password)
-					fmt.Println("")
-				} else {
+				// TODO: solution for reading from file inputs whose compilation does not fail on windows
+				//if terminal.IsTerminal(syscall.Stdin) {
+				password, _ := terminal.ReadPassword(int(syscall.Stdin))
+				passwordString = string(password)
+				fmt.Println("")
+				/*} else {
 
 					passwordString, _ = reader.ReadString('\n')
 					passwordString = strings.TrimSuffix(passwordString, "\n")
 
-				}
+				}*/
 
 				returnCode := 0
 				authenticated, returnCode = Authenticate(email, passwordString)
@@ -177,19 +179,20 @@ func login(in *os.File) {
 
 			}
 
-			if terminal.IsTerminal(syscall.Stdin) {
+			// TODO: solution for reading from file inputs whose compilation does not fail on windows
+			//if terminal.IsTerminal(syscall.Stdin) {
 
-				keystorePassphrase, _ = readPassword("Keystore passphrase: ")
-				keystorePassphrase2, _ = readPassword("Keystore passphrase (reenter): ")
-				fmt.Println("")
-			} else {
+			keystorePassphrase, _ = readPassword("Keystore passphrase: ")
+			keystorePassphrase2, _ = readPassword("Keystore passphrase (reenter): ")
+			fmt.Println("")
+			/*} else {
 
 				keystorePassphrase, _ = reader.ReadString('\n')
 				keystorePassphrase = strings.TrimSuffix(keystorePassphrase, "\n")
 
 				keystorePassphrase2, _ = reader.ReadString('\n')
 				keystorePassphrase2 = strings.TrimSuffix(keystorePassphrase2, "\n")
-			}
+			}*/
 
 			if keystorePassphrase == "" {
 				fmt.Println("Your passphrase must not be empty.")
@@ -219,14 +222,14 @@ func login(in *os.File) {
 }
 
 // Commit => "sign"
-func Sign(filename string, owner string) {
+func Sign(filename string, state Status) {
 
 	// check for token
 	token, _ := LoadToken()
 	if token == "" {
 		fmt.Println("You need to be logged in to sign.")
 		fmt.Println("Proceed by authenticating yourself using <vcn auth>")
-		//PrintErrorURLCustom("token", 428)
+		// PrintErrorURLCustom("token", 428)
 		os.Exit(1)
 	}
 
@@ -235,7 +238,7 @@ func Sign(filename string, owner string) {
 	if hasKeystore == false {
 		fmt.Printf("You need a keystore to sign.\n")
 		fmt.Println("Proceed by authenticating yourself using <vcn auth>")
-		//PrintErrorURLCustom("keystore", 428)
+		// PrintErrorURLCustom("keystore", 428)
 		os.Exit(1)
 	}
 
@@ -245,8 +248,8 @@ func Sign(filename string, owner string) {
 	if strings.HasPrefix(filename, "docker:") {
 
 		artifactHash = getDockerHash(filename)
-		//fmt.Printf("Docker: Not yet implemented\n")
-		//os.Exit(1)
+		// fmt.Printf("Docker: Not yet implemented\n")
+		// os.Exit(1)
 
 	} else if strings.HasPrefix(filename, "git:") {
 		fmt.Printf("git: Not yet implemented\n")
@@ -294,14 +297,16 @@ func Sign(filename string, owner string) {
 
 	WG.Add(1)
 	go publisherEventTracker("VCN_SIGN")
+	WG.Add(1)
+	go artifactCommitTracker(artifactHash, filename, state)
 
 	// TODO: return and display: block #, trx #
-	commitHash(artifactHash, owner, string(passphrase), filename)
+	_, _ = commitHash(artifactHash, string(passphrase), filename, state)
 	fmt.Println("")
-	fmt.Println("Artifact:\t\t", filename)
-	fmt.Println("Hash:\t\t", artifactHash)
-	fmt.Println("Date:\t\t", time.Now())
-	fmt.Println("Signer:\t\t", owner)
+	fmt.Println("Asset:\t", filename)
+	fmt.Println("Hash:\t", artifactHash)
+	//fmt.Println("Date:\t\t", time.Now())
+	//fmt.Println("Signer:\t", "<pubKey>")
 
 	WG.Wait()
 }
@@ -327,20 +332,25 @@ func verify(filename string) {
 	if strings.HasPrefix(filename, "docker:") {
 
 		artifactHash = getDockerHash(filename)
-		//fmt.Printf("Docker: Not yet implemented\n")
-		//os.Exit(1)
+		// fmt.Printf("Docker: Not yet implemented\n")
+		// os.Exit(1)
 	} else {
 		artifactHash = strings.TrimSpace(hash(filename))
 	}
 
 	// fire a go routine for the tracking that shall not delay the main user interaction
 	WG.Add(1)
-	go artifactTracker(artifactHash)
+	go artifactVerifyTracker(artifactHash)
 
-	verified, owner, timestamp := verifyHash(artifactHash)
+	verified, owner, level, status, timestamp := verifyHash(artifactHash)
 
-	fmt.Println("File:\t", filename)
+	LOG.WithFields(logrus.Fields{
+		"verified": verified,
+	}).Debug("verifyHash()")
+
+	fmt.Println("Asset:\t", filename)
 	fmt.Println("Hash:\t", artifactHash)
+
 	if timestamp != 0 {
 		fmt.Println("Date:\t", time.Unix(timestamp, 0))
 	}
@@ -348,16 +358,18 @@ func verify(filename string) {
 		fmt.Println("Signer:\t", owner)
 	}
 
-	fmt.Print("Trust:\t")
-	if verified {
-		color.Set(color.FgHiWhite, color.BgCyan, color.Bold)
-		fmt.Print("VERIFIED")
+	fmt.Println("Level:\t", getLevelName(int(level)))
+
+	fmt.Print("Status:\t ")
+	if status == int64(OK) {
+		color.Set(StyleSuccess())
 	} else {
-		color.Set(color.FgHiWhite, color.BgMagenta, color.Bold)
-		fmt.Print("UNKNOWN")
+		color.Set(StyleError())
 		defer os.Exit(1)
 	}
+	fmt.Print(getStatusName(int(status)))
 	color.Unset()
+
 	fmt.Println()
 
 	// wait for the asset tracker to put data to analytics

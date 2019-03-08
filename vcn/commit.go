@@ -14,23 +14,76 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math/big"
 	"os"
 	"time"
 
+	"github.com/dghubble/sling"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/sirupsen/logrus"
 )
 
-func commitHash(hash string, owner string, passphrase string, filename string) {
+type ArtifactCommitTrackerRequest struct {
+	Filename string `json:"filename"`
+	Hash     string `json:"hash"`
+	Name     string `json:"name"`
+	Url      string `json:"url"`
+}
+
+func artifactCommitTracker(hash string, filename string, status Status) {
+
+	token, err := LoadToken()
+	if err != nil {
+		LOG.WithFields(logrus.Fields{
+			"filename": filename,
+		}).Error("Could not load token.")
+	}
+
+	// make sure the tracker does its analytics although the main
+	// thread against the BC has already finalized
+	defer WG.Done()
+
+	restError := new(Error)
+	r, err := sling.New().
+		Post(TrackingEvent()+"/sign").
+		Add("Authorization", "Bearer "+token).
+		BodyJSON(ArtifactCommitTrackerRequest{
+			Name:     getStatusName(int(status)),
+			Hash:     hash,
+			Filename: filename,
+		}).Receive(nil, restError)
+	if err != nil {
+		fmt.Println(err)
+
+	}
+	if r.StatusCode != 200 {
+
+		LOG.WithFields(logrus.Fields{
+			"errMsg": restError.Message,
+			"status": restError.Status,
+		}).Error("API analytics (commit tracker) failed")
+	} else {
+		LOG.WithFields(logrus.Fields{
+			"hash": hash,
+		}).Info("Verify tracker / analytics written")
+	}
+
+}
+
+func commitHash(hash string, passphrase string, filename string, status Status) (ret bool, code int) {
 	reader, err := firstFile(WalletDirectory())
 	if err != nil {
-		log.Fatal(err)
+		LOG.WithFields(logrus.Fields{
+			"error": err,
+		}).Fatal("Could not load keystore")
 	}
 	transactor, err := bind.NewTransactor(reader, passphrase)
 	if err != nil {
-		//log.Fatal(err)
-		fmt.Printf("\n%s\n", err.Error())
+		LOG.WithFields(logrus.Fields{
+			"error": err,
+		}).Error("Could not load contract")
 		PrintErrorURLCustom("sign", 401)
 		os.Exit(1)
 	}
@@ -38,23 +91,38 @@ func commitHash(hash string, owner string, passphrase string, filename string) {
 	transactor.GasPrice = GasPrice()
 	client, err := ethclient.Dial(MainNetEndpoint())
 	if err != nil {
-		log.Fatal(err)
+		LOG.WithFields(logrus.Fields{
+			"error":   err,
+			"network": MainNetEndpoint(),
+		}).Fatal("Cannot connect to blockchain")
 	}
-	address := common.HexToAddress(ProofContractAddress())
-	instance, err := NewProof(address, client)
+	address := common.HexToAddress(AssetsRelayContractAddres())
+	instance, err := NewAssetsRelay(address, client)
 	if err != nil {
-		log.Fatal(err)
+		LOG.WithFields(logrus.Fields{
+			"error":    err,
+			"contract": AssetsRelayContractAddres(),
+		}).Fatal("Cannot instantiate contract")
 	}
-	tx, err := instance.Set(transactor, owner, hash)
+	tx, err := instance.Sign(transactor, hash, big.NewInt(int64(status)))
 	if err != nil {
-		log.Fatal(err)
+		LOG.WithFields(logrus.Fields{
+			"error": err,
+			"hash":  hash,
+		}).Fatal("method <Sign> failed")
 	}
 	timeout, err := waitForTx(tx.Hash(), TxVerificationRounds(), PollInterval())
 	if err != nil {
-		log.Fatal(err)
+		LOG.WithFields(logrus.Fields{
+			"error": err,
+		}).Error("Could not write to blockchain")
+		PrintErrorURLCustom("blockchain-permission", 403)
+		os.Exit(1)
 	}
 	if timeout {
-		log.Fatal("transaction timed out")
+		LOG.WithFields(logrus.Fields{
+			"error": err,
+		}).Fatal("Writing to blockchain timed out")
 	}
 	publicKey, err := PublicKeyForLocalWallet()
 	if err != nil {
@@ -64,6 +132,8 @@ func commitHash(hash string, owner string, passphrase string, filename string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	return true, 0
 }
 
 func waitForTx(tx common.Hash, maxRounds uint64, pollInterval time.Duration) (timeout bool, err error) {
