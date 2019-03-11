@@ -13,7 +13,7 @@ import (
 	"testing"
 )
 
-func TestVerifyDocker(t *testing.T) {
+func IgnoreTestVerifyDocker(t *testing.T) {
 	// make sure the docker verification works e2e
 	const helloWorld string = "hello-world"
 

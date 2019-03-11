@@ -43,7 +43,6 @@ func login(in *os.File) {
 	if in == nil {
 		in = os.Stdin
 	}
-	reader := bufio.NewReader(in)
 
 	// file system: token exists && api: token is valid
 	// no => enter email
@@ -60,10 +59,15 @@ func login(in *os.File) {
 	tokenValid := CheckToken(token)
 
 	if tokenValid == false {
+		var email string
 
 		fmt.Print("Email address: ")
-		email, _ := reader.ReadString('\n')
-		email = strings.TrimSuffix(email, "\n")
+		_, err := fmt.Scanln(&email)
+		if err != nil {
+			log.Fatal(err)
+		}
+		email = strings.Trim(email, "\n")
+		email = strings.Trim(email, "\r")
 
 		LOG.WithFields(logrus.Fields{
 			"email": email,
