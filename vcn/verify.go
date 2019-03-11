@@ -33,10 +33,15 @@ func artifactVerifyTracker(hash string, filename string) {
 	// thread against the BC has already finalized
 	defer WG.Done()
 
+	token, _ := LoadToken()
+
 	restError := new(Error)
-	r, err := sling.New().
-		Post(TrackingEvent() + "/verify").
-		//Add("Authorization", "Bearer "+token).
+	client := sling.New().
+		Post(TrackingEvent() + "/verify")
+	if token != "" {
+		client = client.Add("Authorization", "Bearer "+token)
+	}
+	r, err := client.
 		BodyJSON(ArtifactVerifyTrackerRequest{
 			Client:   "VCN:" + VCN_VERSION,
 			Filename: filename,
