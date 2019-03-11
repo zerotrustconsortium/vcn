@@ -41,24 +41,24 @@ const (
 func DashboardURL() string {
 	// production:  https://dashboard.vchain.us
 	// staging: 	https://dashboard.staging.vchain.us
-	return "https://dashboard.staging.vchain.us"
+	return "https://dashboard.vchain.us"
 }
 func MainNetEndpoint() string {
 	// production:  https://main.vchain.us
 	// staging: 	https://main.staging.vchain.us
-	return "https://main.staging.vchain.us"
+	return "https://main.vchain.us"
 }
 
 func FoundationEndpoint() string {
 	// production: 	https://api.vchain.us/foundation
 	// staging: 	https://api.staging.vchain.us/foundation
-	return "https://api.staging.vchain.us/foundation"
+	return "https://api.vchain.us/foundation"
 }
 
 func AssetsRelayContractAddress() string {
 	// production:  0x495021fe1a48a5b0c85ef1abd68c42cdfc7cda08
 	// staging: 	0xf1d4b9fe8290bb5718db5d46c313e7b266570c21
-	return "0xf1d4b9fe8290bb5718db5d46c313e7b266570c21"
+	return "0x495021fe1a48a5b0c85ef1abd68c42cdfc7cda08"
 }
 
 func StyleAffordance() (color.Attribute, color.Attribute, color.Attribute) {
