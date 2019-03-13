@@ -39,20 +39,20 @@ const (
 )
 
 func DashboardURL() string {
-	// production:  https://dashboard.vchain.us
-	// staging: 	https://dashboard.staging.vchain.us
-	return "https://dashboard.vchain.us"
+	// production:  https://dashboard.codenotary.io
+	// staging: 	https://dashboard.staging.codenotary.io
+	return "https://dashboard.codenotary.io"
 }
 func MainNetEndpoint() string {
-	// production:  https://main.vchain.us
-	// staging: 	https://main.staging.vchain.us
-	return "https://main.vchain.us"
+	// production:  https://main.codenotary.io
+	// staging: 	https://main.staging.codenotary.io
+	return "https://main.codenotary.io"
 }
 
 func FoundationEndpoint() string {
-	// production: 	https://api.vchain.us/foundation
-	// staging: 	https://api.staging.vchain.us/foundation
-	return "https://api.vchain.us/foundation"
+	// production: 	https://api.codenotary.io/foundation
+	// staging: 	https://api.staging.codenotary.io/foundation
+	return "https://api.codenotary.io/foundation"
 }
 
 func AssetsRelayContractAddress() string {
