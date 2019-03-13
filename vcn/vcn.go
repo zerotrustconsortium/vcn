@@ -26,7 +26,7 @@ import (
 var LOG = logrus.New()
 
 // VCN_VERSION sets the version for the build + some logging with analytics
-var VCN_VERSION = "0.3.2"
+var VCN_VERSION = "0.3.3"
 
 // WG waitgroup for sync of threads across the whole project
 var WG sync.WaitGroup
