@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"syscall"
 	"time"
@@ -302,10 +303,10 @@ func Sign(filename string, state Status) {
 	WG.Add(1)
 	go publisherEventTracker("VCN_SIGN")
 	WG.Add(1)
-	go artifactCommitTracker(artifactHash, filename, state)
+	go artifactCommitTracker(artifactHash, filepath.Base(filename), state)
 
 	// TODO: return and display: block #, trx #
-	_, _ = commitHash(artifactHash, string(passphrase), filename, state)
+	_, _ = commitHash(artifactHash, string(passphrase), filepath.Base(filename), state)
 	fmt.Println("")
 	fmt.Println("Asset:\t", filename)
 	fmt.Println("Hash:\t", artifactHash)
