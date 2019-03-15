@@ -229,7 +229,7 @@ func login(in *os.File) {
 }
 
 // Commit => "sign"
-func Sign(filename string, state Status) {
+func Sign(filename string, state Status, visibility Visibility) {
 
 	// check for token
 	token, _ := LoadToken()
@@ -308,7 +308,7 @@ func Sign(filename string, state Status) {
 	go artifactCommitTracker(artifactHash, filepath.Base(filename), state)
 
 	// TODO: return and display: block #, trx #
-	_, _ = commitHash(artifactHash, string(passphrase), filepath.Base(filename), state)
+	_, _ = commitHash(artifactHash, string(passphrase), filepath.Base(filename), state, visibility)
 	fmt.Println("")
 	fmt.Println("Asset:\t", filename)
 	fmt.Println("Hash:\t", artifactHash)
@@ -369,7 +369,7 @@ func verify(filename string) {
 		fmt.Println("Level:\t NA")
 	}
 	fmt.Print("Status:\t ")
-	if status == int64(OK) {
+	if status == int64(TRUSTED) {
 		color.Set(StyleSuccess())
 	} else {
 		color.Set(StyleError())

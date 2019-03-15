@@ -13,16 +13,6 @@ import (
 	"testing"
 )
 
-func TestGetStatusName(t *testing.T) {
-
-	name := getStatusName(int(UNSUPPORTED))
-	name += getStatusName(int(OK))
-	name += getStatusName(int(UNTRUSTED))
-
-	if name != "UNSUPPORTEDOKUNTRUSTED" {
-		t.Error("Status enumeration seems broken")
-	}
-}
 func TestErrorURLComposition(t *testing.T) {
 
 	expectedURL := "https://github.com/vchain-us/vcn/wiki/Errors#publisher-post-412"

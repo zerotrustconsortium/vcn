@@ -31,6 +31,8 @@ var VCN_VERSION = "0.3.3"
 // WG waitgroup for sync of threads across the whole project
 var WG sync.WaitGroup
 
+var public = false
+
 func main() {
 
 	ll := os.Getenv("LOG_LEVEL")
@@ -90,8 +92,11 @@ func main() {
 				if c.NArg() == 0 {
 					return fmt.Errorf("filename or type:reference required")
 				}
-				Sign(c.Args().First(), OK)
+				Sign(c.Args().First(), TRUSTED, visibilityForFlag(public))
 				return nil
+			},
+			Flags: []cli.Flag{
+				cli.BoolFlag{Name: "public", Destination: &public},
 			},
 		},
 		{
@@ -103,8 +108,11 @@ func main() {
 				if c.NArg() == 0 {
 					return fmt.Errorf("filename or type:reference required")
 				}
-				Sign(c.Args().First(), UNTRUSTED)
+				Sign(c.Args().First(), UNTRUSTED, visibilityForFlag(public))
 				return nil
+			},
+			Flags: []cli.Flag{
+				cli.BoolFlag{Name: "public", Destination: &public},
 			},
 		},
 		{
@@ -116,8 +124,11 @@ func main() {
 				if c.NArg() == 0 {
 					return fmt.Errorf("filename or type:reference required")
 				}
-				Sign(c.Args().First(), UNSUPPORTED)
+				Sign(c.Args().First(), UNSUPPORTED, visibilityForFlag(public))
 				return nil
+			},
+			Flags: []cli.Flag{
+				cli.BoolFlag{Name: "public", Destination: &public},
 			},
 		},
 		{

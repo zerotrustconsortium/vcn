@@ -17,8 +17,13 @@ import (
 )
 
 type ArtifactRequest struct {
-	Name string `json:"name"`
-	Hash string `json:"hash"`
+	Name       string `json:"name"`
+	Hash       string `json:"hash"`
+	Filename   string `json:"filename"`
+	Url        string `json:"url"`
+	License    string `json:"license"`
+	Visibility string `json:"visibility"`
+	Status     string `json:"status"`
 }
 
 type PagedArtifactResponse struct {
@@ -26,12 +31,14 @@ type PagedArtifactResponse struct {
 }
 
 type ArtifactResponse struct {
-	Name            string   `json:"name"`
-	Hash            string   `json:"hash"`
-	Level           int      `json:"level"`
-	Visibility      string   `json:"visibility"`
-	Status          string   `json:"status"`
-	IntegrityChecks []string `json:"integrityChecks"`
+	Name       string `json:"name"`
+	Hash       string `json:"hash"`
+	Filename   string `json:"filename"`
+	Level      int    `json:"level"`
+	Visibility string `json:"visibility"`
+	Status     string `json:"status"`
+	Publisher  string `json:"publisher"`
+	CreatedAt  string `json:"createdAt"`
 }
 
 func (a ArtifactResponse) String() string {
@@ -40,7 +47,7 @@ func (a ArtifactResponse) String() string {
 		a.Name, a.Hash, a.Status)
 }
 
-func CreateArtifact(walletAddress string, name string, hash string) error {
+func CreateArtifact(walletAddress string, name string, hash string, visibility Visibility, status Status) error {
 	restError := new(Error)
 	token, err := LoadToken()
 	if err != nil {
@@ -52,8 +59,11 @@ func CreateArtifact(walletAddress string, name string, hash string) error {
 		Post(ArtifactEndpoint(walletAddress)).
 		Add("Authorization", "Bearer "+token).
 		BodyJSON(ArtifactRequest{
-			Name: name,
-			Hash: hash,
+			Name:       name,
+			Hash:       hash,
+			Filename:   name,
+			Visibility: visibilityName(visibility),
+			Status:     getStatusName(int(status)),
 		}).Receive(nil, restError)
 	if err != nil {
 		return err

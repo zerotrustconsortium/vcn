@@ -33,10 +33,17 @@ const (
 type Status int
 
 const (
-	OK             Status = 0
-	UNSUPPORTED    Status = 1
+	TRUSTED        Status = 0
+	UNTRUSTED      Status = 1
 	STATUS_UNKNOWN Status = 2
-	UNTRUSTED      Status = 3
+	UNSUPPORTED    Status = 3
+)
+
+type Visibility int
+
+const (
+	PUBLIC  Visibility = 0
+	PRIVATE Visibility = 1
 )
 
 func DashboardURL() string {

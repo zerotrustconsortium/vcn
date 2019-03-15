@@ -170,19 +170,37 @@ func getLevelName(level int) (name string) {
 		return "UNKNOWN"
 	}
 }
-func getStatusName(status int) (name string) {
 
+func getStatusName(status int) (name string) {
 	switch status {
-	case int(OK):
-		return "OK"
-	case int(UNSUPPORTED):
-		return "UNSUPPORTED"
-	case int(STATUS_UNKNOWN):
-		return "UNKNOWN"
+	case int(TRUSTED):
+		return "TRUSTED"
 	case int(UNTRUSTED):
 		return "UNTRUSTED"
+	case int(STATUS_UNKNOWN):
+		return "UNKNOWN"
+	case int(UNSUPPORTED):
+		return "UNSUPPORTED"
 	default:
 		return "UNTRUSTED"
 	}
+}
 
+func visibilityName(visibility Visibility) (name string) {
+	switch visibility {
+	case PUBLIC:
+		return "PUBLIC"
+	case PRIVATE:
+		return "PRIVATE"
+	default:
+		return ""
+	}
+}
+
+func visibilityForFlag(public bool) (visibility Visibility) {
+	if public {
+		return PUBLIC
+	} else {
+		return PRIVATE
+	}
 }
