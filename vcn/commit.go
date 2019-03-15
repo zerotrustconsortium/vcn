@@ -80,6 +80,22 @@ func commitHash(hash string, passphrase string, filename string, status Status) 
 		}).Fatal("Could not load keystore")
 	}
 	transactor, err := bind.NewTransactor(reader, passphrase)
+	walletSynced, err := isWalletSynced(transactor.From.Hex())
+	if err != nil {
+		LOG.WithFields(logrus.Fields{
+			"error": err,
+		}).Error("Could not load wallets")
+		PrintErrorURLCustom("wallet", 400)
+		os.Exit(1)
+	}
+	if !walletSynced {
+		LOG.Error("\n", filename, " cannot be signed with CodeNotary. We are "+
+			"finalizing your account configuration.\nWe will complete the "+
+			"configuration shortly and we will update you as soon as this "+
+			"is done.\nWe are sorry for the inconvenience and would like "+
+			"to thank you for your patience.")
+		os.Exit(1)
+	}
 	if err != nil {
 		LOG.WithFields(logrus.Fields{
 			"error": err,

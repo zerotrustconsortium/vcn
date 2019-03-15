@@ -10,8 +10,10 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
+	"strings"
 
 	"github.com/dghubble/sling"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
@@ -19,8 +21,11 @@ import (
 )
 
 type Wallet struct {
-	Id      uint64 `json:"id"`
-	Address string `json:"address"`
+	Address             string `json:"address"`
+	CreatedAt           string `json:"createdAt"`
+	Name                string `json:"name"`
+	PermissionSyncState string `json:"permissionSyncState"`
+	LevelSyncState      string `json:"levelSyncState"`
 }
 
 type PagedWalletResponse struct {
@@ -44,6 +49,34 @@ func CreateKeystore(password string) (pubKey string, wallet string) {
 	go publisherEventTracker("KEYSTORE_CREATED")
 
 	return pubKey, wallet
+}
+
+func isWalletSynced(address string) (result bool, err error) {
+	authError := new(Error)
+	pagedWalletResponse := new(PagedWalletResponse)
+	token, err := LoadToken()
+	if err != nil {
+		log.Fatal(err)
+	}
+	r, err := sling.New().
+		Add("Authorization", "Bearer "+token).
+		Get(WalletEndpoint()).
+		Receive(pagedWalletResponse, authError)
+	if err != nil {
+		return false, err
+	}
+	if r.StatusCode != 200 {
+		return false, fmt.Errorf(
+			"request failed: %s (%d)", authError.Message,
+			authError.Status)
+	}
+	for _, wallet := range (*pagedWalletResponse).Content {
+		if wallet.Address == strings.ToLower(address) {
+			return wallet.PermissionSyncState == "SYNCED" &&
+				wallet.LevelSyncState == "SYNCED", nil
+		}
+	}
+	return false, fmt.Errorf("no such wallet: %s", address)
 }
 
 func HasKeystore() (bool, error) {
