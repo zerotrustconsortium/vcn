@@ -17,12 +17,14 @@ import (
 	"bufio"
 	"fmt"
 	"log"
+	"math/big"
 	"os"
 	"path/filepath"
 	"strings"
 	"syscall"
 	"time"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/fatih/color"
 	"github.com/pkg/browser"
 	"github.com/sirupsen/logrus"
@@ -347,7 +349,7 @@ func verify(filename string) {
 	WG.Add(1)
 	go artifactVerifyTracker(artifactHash, filename)
 
-	verified, owner, level, status, timestamp := verifyHash(artifactHash)
+	verified, signer, level, status, timestamp := verifyHash(artifactHash)
 
 	LOG.WithFields(logrus.Fields{
 		"verified": verified,
@@ -359,12 +361,13 @@ func verify(filename string) {
 	if timestamp != 0 {
 		fmt.Println("Date:\t", time.Unix(timestamp, 0))
 	}
-	if owner != "" {
-		fmt.Println("Signer:\t", owner)
+	if signer != common.BigToAddress(big.NewInt(0)).Hex() {
+		fmt.Println("Signer:\t", signer)
+		fmt.Println("Level:\t", getLevelName(int(level)))
+	} else {
+		fmt.Println("Signer:\t NA")
+		fmt.Println("Level:\t NA")
 	}
-
-	fmt.Println("Level:\t", getLevelName(int(level)))
-
 	fmt.Print("Status:\t ")
 	if status == int64(OK) {
 		color.Set(StyleSuccess())
@@ -374,10 +377,7 @@ func verify(filename string) {
 	}
 	fmt.Print(getStatusName(int(status)))
 	color.Unset()
-
 	fmt.Println()
-
-	// wait for the asset tracker to put data to analytics
 	WG.Wait()
 }
 

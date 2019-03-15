@@ -131,7 +131,7 @@ func getDockerHash(param string) (hash string) {
 		os.Exit(1)
 	}
 
-	//var dockerInspect interface {}
+	// var dockerInspect interface {}
 	dockerIDFilter, err := jsonpath.Prepare("$..Id")
 	if err != nil {
 		panic(err)
@@ -177,6 +177,8 @@ func getStatusName(status int) (name string) {
 		return "OK"
 	case int(UNSUPPORTED):
 		return "UNSUPPORTED"
+	case int(STATUS_UNKNOWN):
+		return "UNKNOWN"
 	case int(UNTRUSTED):
 		return "UNTRUSTED"
 	default:

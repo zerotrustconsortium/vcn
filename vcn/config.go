@@ -33,9 +33,10 @@ const (
 type Status int
 
 const (
-	OK          Status = 0
-	UNSUPPORTED Status = 1
-	UNTRUSTED   Status = 2
+	OK             Status = 0
+	UNSUPPORTED    Status = 1
+	STATUS_UNKNOWN Status = 2
+	UNTRUSTED      Status = 3
 )
 
 func DashboardURL() string {
