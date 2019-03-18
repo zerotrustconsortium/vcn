@@ -149,10 +149,7 @@ func login(in *os.File) {
 
 	}
 
-	// track successful login as early as possible
-	// fire a go routine for the tracking that shall not delay the main user interaction
-	WG.Add(1)
-	go publisherEventTracker("VCN_LOGIN")
+	_ = TrackPublisher("VCN_LOGIN")
 
 	hasKeystore, err := HasKeystore()
 	if err != nil {
@@ -303,8 +300,7 @@ func Sign(filename string, state Status, visibility Visibility) {
 
 	go displayLatency()
 
-	WG.Add(1)
-	go publisherEventTracker("VCN_SIGN")
+	_ = TrackPublisher("VCN_SIGN")
 	WG.Add(1)
 	go artifactCommitTracker(artifactHash, filepath.Base(filename), state)
 
@@ -319,18 +315,11 @@ func Sign(filename string, state Status, visibility Visibility) {
 	WG.Wait()
 }
 
-// VerifyAll => main entry point from cli
-// unwraps potential list input for verify()
 func VerifyAll(files []string) {
-
-	WG.Add(1)
-	go publisherEventTracker("VCN_VERIFY")
-
+	_ = TrackPublisher("VCN_VERIFY")
 	for _, file := range files {
 		verify(file)
 	}
-
-	WG.Wait()
 }
 func verify(filename string) {
 

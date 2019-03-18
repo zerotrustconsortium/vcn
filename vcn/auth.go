@@ -48,49 +48,6 @@ type PublisherResponse struct {
 	LastName    string   `json:"lastName"`
 }
 
-type PublisherEventTrackerRequest struct {
-	Name string `json:"name"`
-}
-
-func publisherEventTracker(event string) {
-
-	token, err := LoadToken()
-	if err != nil {
-		LOG.WithFields(logrus.Fields{
-			"event": event,
-		}).Error("Could not load token. (maybe it's an anonymous verify)")
-	}
-
-	LOG.Trace("publisherEventTracker() started")
-
-	// make sure the tracker does its analytics although the main
-	// thread has already finalized
-	defer WG.Done()
-
-	restError := new(Error)
-	r, err := sling.New().
-		Post(TrackingEvent()+"/publisher").
-		Add("Authorization", "Bearer "+token).
-		BodyJSON(PublisherEventTrackerRequest{
-			Name: event,
-		}).Receive(nil, restError)
-	if err != nil {
-		LOG.WithFields(logrus.Fields{
-			"err": err,
-		}).Warn("Login analytics seems broken")
-
-	}
-	if r.StatusCode != 200 {
-		LOG.WithFields(logrus.Fields{
-			"errorMsg": restError.Message,
-			"status":   restError.Status,
-		}).Warn("Login analytics API failed")
-	}
-
-	LOG.Trace("publisherEventTracker() finished")
-
-}
-
 func CheckPublisherExists(email string) (ret bool) {
 
 	email = strings.TrimSpace(email)
@@ -100,7 +57,7 @@ func CheckPublisherExists(email string) (ret bool) {
 	restError := new(Error)
 
 	r, err := sling.New().
-		Get(PublisherEndpoint()+"/exists").
+		Get(PublisherEndpoint() + "/exists").
 		QueryStruct(params).
 		Receive(&response, restError)
 
@@ -163,7 +120,7 @@ func Authenticate(email string, password string) (ret bool, code int) {
 	authError := new(Error)
 
 	r, err := sling.New().
-		Post(PublisherEndpoint()+"/auth").
+		Post(PublisherEndpoint() + "/auth").
 		BodyJSON(AuthRequest{Email: email, Password: password}).
 		Receive(token, authError)
 	if err != nil {

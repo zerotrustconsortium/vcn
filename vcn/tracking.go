@@ -19,6 +19,10 @@ type ArtifactVerifyTrackerRequest struct {
 	Url      string `json:"url"`
 }
 
+type PublisherEventTrackerRequest struct {
+	Name string `json:"name"`
+}
+
 func TrackVerify(hash string, filename string) (err error) {
 	restError := new(Error)
 	token, err := LoadToken()
@@ -37,6 +41,26 @@ func TrackVerify(hash string, filename string) (err error) {
 	}
 	if r.StatusCode != 200 {
 		return fmt.Errorf("TrackVerify failed: %s", restError)
+	}
+	return nil
+}
+
+func TrackPublisher(event string) (err error) {
+	restError := new(Error)
+	token, err := LoadToken()
+	if err != nil {
+		return err
+	}
+	r, err := NewSling(token).
+		Post(TrackingEvent() + "/publisher").
+		BodyJSON(PublisherEventTrackerRequest{
+			Name: event,
+		}).Receive(nil, restError)
+	if err != nil {
+		return err
+	}
+	if r.StatusCode != 200 {
+		return fmt.Errorf("TrackPublisher failed: %s", restError)
 	}
 	return nil
 }

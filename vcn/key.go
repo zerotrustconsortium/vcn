@@ -46,7 +46,7 @@ func CreateKeystore(password string) (pubKey string, wallet string) {
 	wallet = WalletDirectory()
 
 	WG.Add(1)
-	go publisherEventTracker("KEYSTORE_CREATED")
+	go TrackPublisher("KEYSTORE_CREATED")
 
 	return pubKey, wallet
 }
@@ -151,7 +151,7 @@ func SyncKeys() {
 	}
 
 	WG.Add(1)
-	go publisherEventTracker("KEYSTORE_UPLOADED")
+	go TrackPublisher("KEYSTORE_UPLOADED")
 
 }
 
