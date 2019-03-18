@@ -67,8 +67,8 @@ func CreateArtifact(walletAddress string, name string, hash string, visibility V
 			Name:       name,
 			Hash:       hash,
 			Filename:   name,
-			Visibility: visibilityName(visibility),
-			Status:     statusName(int(status)),
+			Visibility: VisibilityName(visibility),
+			Status:     StatusName(status),
 			MetaHash:   metaHash,
 		}).Receive(nil, restError)
 	if err != nil {

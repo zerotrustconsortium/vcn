@@ -378,20 +378,20 @@ func verify(filename string) {
 		} else {
 			fmt.Println("Signer:\t", signer)
 		}
-		fmt.Println("Level:\t", levelName(int(level)))
+		fmt.Println("Level:\t", LevelName(level))
 
 	} else {
 		fmt.Println("Signer:\t NA")
 		fmt.Println("Level:\t NA")
 	}
 	fmt.Print("Status:\t ")
-	if status == int64(STATUS_TRUSTED) {
+	if status == StatusTrusted {
 		color.Set(StyleSuccess())
 	} else {
 		color.Set(StyleError())
 		defer os.Exit(1)
 	}
-	fmt.Print(statusName(int(status)))
+	fmt.Print(StatusName(status))
 	color.Unset()
 	fmt.Println()
 	WG.Wait()

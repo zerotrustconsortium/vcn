@@ -65,7 +65,7 @@ func artifactVerifyTracker(hash string, filename string) {
 
 }
 
-func verifyHash(hash string) (verified bool, owner string, level int64, status int64, timestamp int64) {
+func verifyHash(hash string) (verified bool, owner string, level Level, status Status, timestamp int64) {
 	client, err := ethclient.Dial(MainNetEndpoint())
 	if err != nil {
 		LOG.WithFields(logrus.Fields{
@@ -90,7 +90,7 @@ func verifyHash(hash string) (verified bool, owner string, level int64, status i
 	}
 	return address != common.BigToAddress(big.NewInt(0)),
 		address.Hex(),
-		l.Int64(),
-		s.Int64(),
+		Level(l.Int64()),
+		Status(s.Int64()),
 		ts.Int64()
 }

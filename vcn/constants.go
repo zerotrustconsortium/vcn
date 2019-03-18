@@ -8,47 +8,47 @@ import (
 var VcnVersion = "0.3.3"
 var WG sync.WaitGroup
 
-type Level int
-type Status int
-type Visibility int
+type Level int64
+type Status int64
+type Visibility int64
 
 const (
-	LEVEL_DISABLED          Level = -1
-	LEVEL_UNKNOWN           Level = 0
-	LEVEL_EMAIL_VERIFIED    Level = 1
-	LEVEL_SOCIAL_VERIFIED   Level = 2
-	LEVEL_ID_VERIFIED       Level = 3
-	LEVEL_LOCATION_VERIFIED Level = 4
-	LEVEL_VCHAIN            Level = 99
+	LevelDisabled         Level = -1
+	LevelUnknown          Level = 0
+	LevelEmailVerified    Level = 1
+	LevelSocialVerified   Level = 2
+	LevelIdVerified       Level = 3
+	LevelLocationVerified Level = 4
+	LevelVchain           Level = 99
 )
 
 const (
-	STATUS_TRUSTED     Status = 0
-	STATUS_UNTRUSTED   Status = 1
-	STATUS_UNKNOWN     Status = 2
-	STATUS_UNSUPPORTED Status = 3
+	StatusTrusted     Status = 0
+	StatusUntrusted   Status = 1
+	StatusUnknown     Status = 2
+	StatusUnsupported Status = 3
 )
 
 const (
-	VISIBILITY_PUBLIC  Visibility = 0
-	VISIBILITY_PRIVATE Visibility = 1
+	VisibilityPublic  Visibility = 0
+	VisibilityPrivate Visibility = 1
 )
 
-func levelName(level int) (name string) {
+func LevelName(level Level) (name string) {
 	switch level {
-	case int(LEVEL_DISABLED):
+	case LevelDisabled:
 		return "DISABLED"
-	case int(LEVEL_UNKNOWN):
+	case LevelUnknown:
 		return "UNKNOWN"
-	case int(LEVEL_EMAIL_VERIFIED):
+	case LevelEmailVerified:
 		return "EMAIL_VERIFIED"
-	case int(LEVEL_SOCIAL_VERIFIED):
+	case LevelSocialVerified:
 		return "SOCIAL_VERIFIED"
-	case int(LEVEL_ID_VERIFIED):
+	case LevelIdVerified:
 		return "ID_VERIFIED"
-	case int(LEVEL_LOCATION_VERIFIED):
+	case LevelLocationVerified:
 		return "LOCATION_VERIFIED"
-	case int(LEVEL_VCHAIN):
+	case LevelVchain:
 		return "VCHAIN"
 	default:
 		log.Fatal("unsupported level", name)
@@ -56,15 +56,15 @@ func levelName(level int) (name string) {
 	}
 }
 
-func statusName(status int) (name string) {
+func StatusName(status Status) (name string) {
 	switch status {
-	case int(STATUS_TRUSTED):
+	case StatusTrusted:
 		return "TRUSTED"
-	case int(STATUS_UNTRUSTED):
+	case StatusUntrusted:
 		return "UNTRUSTED"
-	case int(STATUS_UNKNOWN):
+	case StatusUnknown:
 		return "UNKNOWN"
-	case int(STATUS_UNSUPPORTED):
+	case StatusUnsupported:
 		return "UNSUPPORTED"
 	default:
 		log.Fatal("unsupported status", name)
@@ -72,11 +72,11 @@ func statusName(status int) (name string) {
 	}
 }
 
-func visibilityName(visibility Visibility) (name string) {
+func VisibilityName(visibility Visibility) (name string) {
 	switch visibility {
-	case VISIBILITY_PUBLIC:
+	case VisibilityPublic:
 		return "PUBLIC"
-	case VISIBILITY_PRIVATE:
+	case VisibilityPrivate:
 		return "PRIVATE"
 	default:
 		log.Fatal("unsupported visibility", name)
@@ -84,10 +84,10 @@ func visibilityName(visibility Visibility) (name string) {
 	}
 }
 
-func visibilityForFlag(public bool) (visibility Visibility) {
+func VisibilityForFlag(public bool) (visibility Visibility) {
 	if public {
-		return VISIBILITY_PUBLIC
+		return VisibilityPublic
 	} else {
-		return VISIBILITY_PRIVATE
+		return VisibilityPrivate
 	}
 }

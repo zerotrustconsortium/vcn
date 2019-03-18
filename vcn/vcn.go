@@ -60,7 +60,7 @@ func main() {
 				if c.NArg() == 0 {
 					return fmt.Errorf("filename or type:reference required")
 				}
-				Sign(c.Args().First(), STATUS_TRUSTED, visibilityForFlag(publicSigning))
+				Sign(c.Args().First(), StatusTrusted, VisibilityForFlag(publicSigning))
 				return nil
 			},
 			Flags: []cli.Flag{
@@ -76,7 +76,7 @@ func main() {
 				if c.NArg() == 0 {
 					return fmt.Errorf("filename or type:reference required")
 				}
-				Sign(c.Args().First(), STATUS_UNTRUSTED, visibilityForFlag(publicSigning))
+				Sign(c.Args().First(), StatusUntrusted, VisibilityForFlag(publicSigning))
 				return nil
 			},
 			Flags: []cli.Flag{
@@ -92,7 +92,7 @@ func main() {
 				if c.NArg() == 0 {
 					return fmt.Errorf("filename or type:reference required")
 				}
-				Sign(c.Args().First(), STATUS_UNSUPPORTED, visibilityForFlag(publicSigning))
+				Sign(c.Args().First(), StatusUnsupported, VisibilityForFlag(publicSigning))
 				return nil
 			},
 			Flags: []cli.Flag{

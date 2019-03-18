@@ -50,7 +50,7 @@ func artifactCommitTracker(hash string, filename string, status Status) {
 		Post(TrackingEvent() + "/sign").
 		Add("Authorization", "Bearer "+token).
 		BodyJSON(ArtifactCommitTrackerRequest{
-			Name:     statusName(int(status)),
+			Name:     StatusName(status),
 			Hash:     hash,
 			Filename: filename,
 		}).Receive(nil, restError)
