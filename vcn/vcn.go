@@ -20,41 +20,16 @@ import (
 	"github.com/urfave/cli"
 )
 
-//  global variables (rethink this approach)
-
-// LOG logrus logging
-var LOG = logrus.New()
-
 // VCN_VERSION sets the version for the build + some logging with analytics
 var VCN_VERSION = "0.3.3"
 
 // WG waitgroup for sync of threads across the whole project
 var WG sync.WaitGroup
 
-var public = false
-
 func main() {
+	InitLogging()
 
-	ll := os.Getenv("LOG_LEVEL")
-	switch ll {
-	case "TRACE":
-		LOG.SetLevel(logrus.TraceLevel)
-	case "DEBUG":
-		LOG.SetLevel(logrus.DebugLevel)
-	case "INFO":
-		LOG.SetLevel(logrus.InfoLevel)
-	case "WARN": // use this for api errors
-		LOG.SetLevel(logrus.WarnLevel)
-	case "ERROR":
-		LOG.SetLevel(logrus.ErrorLevel)
-	case "FATAL": // results in exit code > 0
-		LOG.SetLevel(logrus.FatalLevel)
-	case "PANIC":
-		LOG.SetLevel(logrus.PanicLevel)
-	default:
-		LOG.SetLevel(logrus.WarnLevel)
-
-	}
+	var publicSigning = false
 
 	LOG.WithFields(logrus.Fields{
 		"version": VCN_VERSION,
@@ -92,11 +67,11 @@ func main() {
 				if c.NArg() == 0 {
 					return fmt.Errorf("filename or type:reference required")
 				}
-				Sign(c.Args().First(), TRUSTED, visibilityForFlag(public))
+				Sign(c.Args().First(), TRUSTED, visibilityForFlag(publicSigning))
 				return nil
 			},
 			Flags: []cli.Flag{
-				cli.BoolFlag{Name: "public", Destination: &public},
+				cli.BoolFlag{Name: "public", Destination: &publicSigning},
 			},
 		},
 		{
@@ -108,11 +83,11 @@ func main() {
 				if c.NArg() == 0 {
 					return fmt.Errorf("filename or type:reference required")
 				}
-				Sign(c.Args().First(), UNTRUSTED, visibilityForFlag(public))
+				Sign(c.Args().First(), UNTRUSTED, visibilityForFlag(publicSigning))
 				return nil
 			},
 			Flags: []cli.Flag{
-				cli.BoolFlag{Name: "public", Destination: &public},
+				cli.BoolFlag{Name: "public", Destination: &publicSigning},
 			},
 		},
 		{
@@ -124,11 +99,11 @@ func main() {
 				if c.NArg() == 0 {
 					return fmt.Errorf("filename or type:reference required")
 				}
-				Sign(c.Args().First(), UNSUPPORTED, visibilityForFlag(public))
+				Sign(c.Args().First(), UNSUPPORTED, visibilityForFlag(publicSigning))
 				return nil
 			},
 			Flags: []cli.Flag{
-				cli.BoolFlag{Name: "public", Destination: &public},
+				cli.BoolFlag{Name: "public", Destination: &publicSigning},
 			},
 		},
 		{
