@@ -41,7 +41,7 @@ func IgnoreTestLoginVerifiedUser(t *testing.T) {
 		},
 	)
 
-	createDirectoryInfrastructure()
+	CreateVcnDirectories()
 
 	// fmt.Println(VcnDirectory())
 

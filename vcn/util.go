@@ -55,9 +55,9 @@ func readPassword(msg string) (string, error) {
 	return string(password), nil
 }
 
-func createDirectoryInfrastructure() {
-	err := os.MkdirAll(WalletDirectory(), os.FileMode(0700))
-	if err != nil {
+func CreateVcnDirectories() {
+	if err := os.MkdirAll(WalletDirectory(),
+		os.FileMode(VcnDirectoryPermissions)); err != nil {
 		log.Fatal(err)
 	}
 }

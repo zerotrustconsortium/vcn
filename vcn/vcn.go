@@ -21,12 +21,13 @@ import (
 
 func main() {
 	InitLogging()
+	CreateVcnDirectories()
 
 	var publicSigning = false
 
 	LOG.WithFields(logrus.Fields{
 		"version": VcnVersion,
-	}).Trace("Started vcn")
+	}).Trace("VCN")
 
 	app := cli.NewApp()
 	app.Name = "vcn"
@@ -34,7 +35,6 @@ func main() {
 	app.Version = VcnVersion
 
 	app.Commands = []cli.Command{
-
 		{
 			Category: "Artifact actions",
 			Name:     "verify",
@@ -135,10 +135,7 @@ func main() {
 			},
 		},
 	}
-
-	createDirectoryInfrastructure()
-	err := app.Run(os.Args)
-	if err != nil {
+	if err := app.Run(os.Args); err != nil {
 		log.Fatal(err)
 	}
 }

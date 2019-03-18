@@ -5,7 +5,9 @@ import (
 	"sync"
 )
 
-var VcnVersion = "0.3.3"
+const VcnVersion = "0.3.3"
+const VcnDirectoryPermissions = 0700
+
 var WG sync.WaitGroup
 
 type Level int64
