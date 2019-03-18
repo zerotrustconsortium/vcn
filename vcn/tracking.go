@@ -12,14 +12,14 @@ import (
 	"fmt"
 )
 
-type ArtifactVerifyTrackerRequest struct {
+type ArtifactTrackingEventRequest struct {
 	Client   string `json:"client"`
 	Filename string `json:"filename"`
 	Hash     string `json:"hash"`
 	Url      string `json:"url"`
 }
 
-type PublisherEventTrackerRequest struct {
+type PublisherTrackingEventRequest struct {
 	Name string `json:"name"`
 }
 
@@ -31,7 +31,7 @@ func TrackVerify(hash string, filename string) (err error) {
 	}
 	r, err := NewSling(token).
 		Post(TrackingEvent() + "/verify").
-		BodyJSON(ArtifactVerifyTrackerRequest{
+		BodyJSON(ArtifactTrackingEventRequest{
 			Client:   VcnClientName(),
 			Filename: filename,
 			Hash:     hash,
@@ -53,7 +53,7 @@ func TrackPublisher(event string) (err error) {
 	}
 	r, err := NewSling(token).
 		Post(TrackingEvent() + "/publisher").
-		BodyJSON(PublisherEventTrackerRequest{
+		BodyJSON(PublisherTrackingEventRequest{
 			Name: event,
 		}).Receive(nil, restError)
 	if err != nil {
