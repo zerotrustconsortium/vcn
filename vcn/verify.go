@@ -9,39 +9,37 @@
 package main
 
 import (
-	"math/big"
+	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/sirupsen/logrus"
 )
 
-func verifyHash(hash string) (verified bool, owner string, level Level, status Status, timestamp int64) {
+type BlockchainVerification struct {
+	Owner     common.Address
+	Level     Level
+	Status    Status
+	Timestamp time.Time
+}
+
+func VerifyHash(hash string) (verification *BlockchainVerification, err error) {
 	client, err := ethclient.Dial(MainNetEndpoint())
 	if err != nil {
-		LOG.WithFields(logrus.Fields{
-			"error":   err,
-			"network": MainNetEndpoint(),
-		}).Fatal("Cannot connect to blockchain")
+		return nil, err
 	}
-	address := common.HexToAddress(AssetsRelayContractAddress())
-	instance, err := NewAssetsRelay(address, client)
+	contractAddress := common.HexToAddress(AssetsRelayContractAddress())
+	instance, err := NewAssetsRelay(contractAddress, client)
 	if err != nil {
-		LOG.WithFields(logrus.Fields{
-			"error":    err,
-			"contract": AssetsRelayContractAddress(),
-		}).Fatal("Cannot instantiate contract")
+		return nil, err
 	}
-	address, l, s, ts, err := instance.Verify(nil, hash)
+	address, level, status, timestamp, err := instance.Verify(nil, hash)
 	if err != nil {
-		LOG.WithFields(logrus.Fields{
-			"error": err,
-			"hash":  hash,
-		}).Fatal("method <Verify> failed")
+		return nil, err
 	}
-	return address != common.BigToAddress(big.NewInt(0)),
-		address.Hex(),
-		Level(l.Int64()),
-		Status(s.Int64()),
-		ts.Int64()
+	verification = new(BlockchainVerification)
+	verification.Owner = address
+	verification.Level = Level(level.Int64())
+	verification.Status = Status(status.Int64())
+	verification.Timestamp = time.Unix(timestamp.Int64(), 0)
+	return verification, nil
 }

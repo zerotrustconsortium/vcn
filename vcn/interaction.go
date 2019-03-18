@@ -348,19 +348,15 @@ func verify(filename string) {
 	if err := TrackVerify(artifactHash, filename); err != nil {
 		log.Fatal("TrackVerify failed", err)
 	}
-	verified, signer, level, status, timestamp := verifyHash(artifactHash)
-
-	LOG.WithFields(logrus.Fields{
-		"verified": verified,
-	}).Debug("verifyHash()")
-
+	verification, err := VerifyHash(artifactHash)
+	if err != nil {
+		log.Fatal("unable to verify hash", err)
+	}
 	fmt.Println("Asset:\t", filename)
 	fmt.Println("Hash:\t", artifactHash)
 
-	if timestamp != 0 {
-		fmt.Println("Date:\t", time.Unix(timestamp, 0))
-	}
-	if signer != common.BigToAddress(big.NewInt(0)).Hex() {
+	if verification.Owner != common.BigToAddress(big.NewInt(0)) {
+		fmt.Println("Date:\t", verification.Timestamp)
 		metaHash, err := hashAsset(artifactHash)
 		if err != nil {
 			log.Fatal("Unable to calculate metahash")
@@ -374,22 +370,22 @@ func verify(filename string) {
 			fmt.Println("Name:\t", artifact.Name)
 			fmt.Println("File:\t", artifact.Filename)
 		} else {
-			fmt.Println("Signer:\t", signer)
+			fmt.Println("Signer:\t", verification.Owner.Hex())
 		}
-		fmt.Println("Level:\t", LevelName(level))
+		fmt.Println("Level:\t", LevelName(verification.Level))
 
 	} else {
 		fmt.Println("Signer:\t NA")
 		fmt.Println("Level:\t NA")
 	}
 	fmt.Print("Status:\t ")
-	if status == StatusTrusted {
+	if verification.Status == StatusTrusted {
 		color.Set(StyleSuccess())
 	} else {
 		color.Set(StyleError())
 		defer os.Exit(1)
 	}
-	fmt.Print(StatusName(status))
+	fmt.Print(StatusName(verification.Status))
 	color.Unset()
 	fmt.Println()
 }
