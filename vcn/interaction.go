@@ -213,7 +213,8 @@ func login(in *os.File) {
 
 		pubKey, wallet := CreateKeystore(keystorePassphrase)
 
-		fmt.Println("Keystore successfully created")
+		fmt.Println("Keystore successfully created. We are updating your user profile.\n" +
+			"You will be able to sign your first asset in one minute")
 		fmt.Println("Public key:\t", pubKey)
 		fmt.Println("Keystore:\t", wallet)
 
