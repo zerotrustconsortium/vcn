@@ -24,6 +24,7 @@ type ArtifactRequest struct {
 	License    string `json:"license"`
 	Visibility string `json:"visibility"`
 	Status     string `json:"status"`
+	MetaHash   string `json:"metaHash"`
 }
 
 type PagedArtifactResponse struct {
@@ -55,8 +56,12 @@ func CreateArtifact(walletAddress string, name string, hash string, visibility V
 		PrintErrorURLCustom("sign", 404)
 		os.Exit(1)
 	}
+	metaHash, err := hashAsset(hash)
+	if err != nil {
+		log.Fatal("unable to hash asset", err)
+	}
 	r, err := sling.New().
-		Post(ArtifactEndpoint(walletAddress)).
+		Post(ArtifactEndpointForWallet(walletAddress)).
 		Add("Authorization", "Bearer "+token).
 		BodyJSON(ArtifactRequest{
 			Name:       name,
@@ -64,6 +69,7 @@ func CreateArtifact(walletAddress string, name string, hash string, visibility V
 			Filename:   name,
 			Visibility: visibilityName(visibility),
 			Status:     getStatusName(int(status)),
+			MetaHash:   metaHash,
 		}).Receive(nil, restError)
 	if err != nil {
 		return err
@@ -91,7 +97,7 @@ func LoadArtifacts(walletAddress string) ([]ArtifactResponse, error) {
 		log.Fatal(err)
 	}
 	r, err := sling.New().
-		Get(ArtifactEndpoint(walletAddress)).
+		Get(ArtifactEndpointForWallet(walletAddress)).
 		Add("Authorization", "Bearer "+token).
 		Receive(&response, restError)
 	if err != nil {
@@ -102,4 +108,28 @@ func LoadArtifacts(walletAddress string) ([]ArtifactResponse, error) {
 			restError.Message, restError.Status)
 	}
 	return response.Content, nil
+}
+
+func LoadArtifactsForHash(hash string, metahash string) (*ArtifactResponse, error) {
+	response := new(ArtifactResponse)
+	restError := new(Error)
+	token, err := LoadToken()
+	if err != nil {
+		log.Fatal(err)
+	}
+	r, err := sling.New().
+		Get(ArtifactEndpoint() + "/" + hash + "/" + metahash).
+		Add("Authorization", "Bearer "+token).
+		Receive(&response, restError)
+	if err != nil {
+		return nil, err
+	}
+	if r.StatusCode == 404 {
+		return nil, nil
+	}
+	if r.StatusCode != 200 {
+		return nil, fmt.Errorf("request failed: %s (%d)",
+			restError.Message, restError.Status)
+	}
+	return response, nil
 }

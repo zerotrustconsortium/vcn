@@ -363,8 +363,23 @@ func verify(filename string) {
 		fmt.Println("Date:\t", time.Unix(timestamp, 0))
 	}
 	if signer != common.BigToAddress(big.NewInt(0)).Hex() {
-		fmt.Println("Signer:\t", signer)
+		metaHash, err := hashAsset(artifactHash)
+		if err != nil {
+			log.Fatal("Unable to calculate metahash")
+		}
+		artifact, err := LoadArtifactsForHash(artifactHash, metaHash)
+		if err != nil {
+			log.Fatal("Unable to resolve metahash")
+		}
+		if artifact != nil && artifact.Visibility == "PUBLIC" {
+			fmt.Println("Signer:\t", artifact.Publisher)
+			fmt.Println("Name:\t", artifact.Name)
+			fmt.Println("File:\t", artifact.Filename)
+		} else {
+			fmt.Println("Signer:\t", signer)
+		}
 		fmt.Println("Level:\t", getLevelName(int(level)))
+
 	} else {
 		fmt.Println("Signer:\t NA")
 		fmt.Println("Level:\t NA")

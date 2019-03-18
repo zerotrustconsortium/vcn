@@ -9,6 +9,7 @@
 package main
 
 import (
+	"crypto/sha256"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -203,4 +204,11 @@ func visibilityForFlag(public bool) (visibility Visibility) {
 	} else {
 		return PRIVATE
 	}
+}
+
+func hashAsset(assetHash string) (metadataHash string, err error) {
+	_, owner, level, status, timestamp := verifyHash(assetHash)
+	metadata := fmt.Sprintf("%s-%d-%d-%d", owner, level, status, timestamp)
+	metadataHashAsBytes := sha256.Sum256([]byte(metadata))
+	return fmt.Sprintf("%x", metadataHashAsBytes), nil
 }

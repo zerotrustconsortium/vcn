@@ -101,7 +101,11 @@ func WalletEndpoint() string {
 	return FoundationEndpoint() + "/v1/wallet"
 }
 
-func ArtifactEndpoint(walletAddress string) string {
+func ArtifactEndpoint() string {
+	return FoundationEndpoint() + "/v1/artifact"
+}
+
+func ArtifactEndpointForWallet(walletAddress string) string {
 	return FoundationEndpoint() + "/v1/artifact?wallet-address=" + walletAddress
 }
 
