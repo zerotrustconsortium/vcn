@@ -12,65 +12,16 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"math/big"
 	"os"
 	"time"
 
-	"github.com/dghubble/sling"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/sirupsen/logrus"
 )
-
-type ArtifactCommitTrackerRequest struct {
-	Filename string `json:"filename"`
-	Hash     string `json:"hash"`
-	Name     string `json:"name"`
-	Url      string `json:"url"`
-}
-
-func artifactCommitTracker(hash string, filename string, status Status) {
-
-	token, err := LoadToken()
-	if err != nil {
-		LOG.WithFields(logrus.Fields{
-			"filename": filename,
-		}).Error("Could not load token.")
-	}
-
-	// make sure the tracker does its analytics although the main
-	// thread against the BC has already finalized
-	defer WG.Done()
-
-	restError := new(Error)
-	r, err := sling.New().
-		Post(TrackingEvent() + "/sign").
-		Add("Authorization", "Bearer "+token).
-		BodyJSON(ArtifactCommitTrackerRequest{
-			Name:     StatusName(status),
-			Hash:     hash,
-			Filename: filename,
-		}).Receive(nil, restError)
-	if err != nil {
-		fmt.Println(err)
-
-	}
-	if r.StatusCode != 200 {
-
-		LOG.WithFields(logrus.Fields{
-			"errMsg": restError.Message,
-			"status": restError.Status,
-		}).Error("API analytics (commit tracker) failed")
-	} else {
-		LOG.WithFields(logrus.Fields{
-			"hash": hash,
-		}).Info("Verify tracker / analytics written")
-	}
-
-}
 
 func commitHash(hash string, passphrase string, filename string, status Status, visibility Visibility) (ret bool, code int) {
 	reader, err := firstFile(WalletDirectory())

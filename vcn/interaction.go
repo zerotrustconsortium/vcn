@@ -301,8 +301,7 @@ func Sign(filename string, state Status, visibility Visibility) {
 	go displayLatency()
 
 	_ = TrackPublisher("VCN_SIGN")
-	WG.Add(1)
-	go artifactCommitTracker(artifactHash, filepath.Base(filename), state)
+	_ = TrackSign(artifactHash, filepath.Base(filename), state)
 
 	// TODO: return and display: block #, trx #
 	_, _ = commitHash(artifactHash, string(passphrase), filepath.Base(filename), state, visibility)

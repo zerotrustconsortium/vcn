@@ -159,7 +159,7 @@ func hashAsset(assetHash string) (metadataHash string, err error) {
 		return "", err
 	}
 	metadata := fmt.Sprintf("%s-%d-%d-%d", verification.Owner,
-		verification.Level, verification.Status, verification.Timestamp)
+		verification.Level, verification.Status, verification.Timestamp.Unix())
 	metadataHashAsBytes := sha256.Sum256([]byte(metadata))
 	return fmt.Sprintf("%x", metadataHashAsBytes), nil
 }
