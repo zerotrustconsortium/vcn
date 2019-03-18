@@ -14,17 +14,10 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"sync"
 
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
-
-// VCN_VERSION sets the version for the build + some logging with analytics
-var VCN_VERSION = "0.3.3"
-
-// WG waitgroup for sync of threads across the whole project
-var WG sync.WaitGroup
 
 func main() {
 	InitLogging()
@@ -32,13 +25,13 @@ func main() {
 	var publicSigning = false
 
 	LOG.WithFields(logrus.Fields{
-		"version": VCN_VERSION,
+		"version": VcnVersion,
 	}).Trace("Started vcn")
 
 	app := cli.NewApp()
 	app.Name = "vcn"
 	app.Usage = "code signing made easy"
-	app.Version = VCN_VERSION
+	app.Version = VcnVersion
 
 	app.Commands = []cli.Command{
 
@@ -67,7 +60,7 @@ func main() {
 				if c.NArg() == 0 {
 					return fmt.Errorf("filename or type:reference required")
 				}
-				Sign(c.Args().First(), TRUSTED, visibilityForFlag(publicSigning))
+				Sign(c.Args().First(), STATUS_TRUSTED, visibilityForFlag(publicSigning))
 				return nil
 			},
 			Flags: []cli.Flag{
@@ -83,7 +76,7 @@ func main() {
 				if c.NArg() == 0 {
 					return fmt.Errorf("filename or type:reference required")
 				}
-				Sign(c.Args().First(), UNTRUSTED, visibilityForFlag(publicSigning))
+				Sign(c.Args().First(), STATUS_UNTRUSTED, visibilityForFlag(publicSigning))
 				return nil
 			},
 			Flags: []cli.Flag{
@@ -99,7 +92,7 @@ func main() {
 				if c.NArg() == 0 {
 					return fmt.Errorf("filename or type:reference required")
 				}
-				Sign(c.Args().First(), UNSUPPORTED, visibilityForFlag(publicSigning))
+				Sign(c.Args().First(), STATUS_UNSUPPORTED, visibilityForFlag(publicSigning))
 				return nil
 			},
 			Flags: []cli.Flag{

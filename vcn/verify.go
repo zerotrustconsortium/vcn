@@ -43,7 +43,7 @@ func artifactVerifyTracker(hash string, filename string) {
 	}
 	r, err := client.
 		BodyJSON(ArtifactVerifyTrackerRequest{
-			Client:   "VCN:" + VCN_VERSION,
+			Client:   "VCN:" + VcnVersion,
 			Filename: filename,
 			Hash:     hash,
 		}).Receive(nil, restError)

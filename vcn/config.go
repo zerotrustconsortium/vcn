@@ -18,34 +18,6 @@ import (
 	"github.com/fatih/color"
 )
 
-type Level int
-
-const (
-	DISABLED          Level = -1
-	UNKNOWN           Level = 0
-	EMAIL_VERIFIED    Level = 1
-	SOCIAL_VERIFIED   Level = 2
-	ID_VERIFIED       Level = 3
-	LOCATION_VERIFIED Level = 4
-	VCHAIN            Level = 99
-)
-
-type Status int
-
-const (
-	TRUSTED        Status = 0
-	UNTRUSTED      Status = 1
-	STATUS_UNKNOWN Status = 2
-	UNSUPPORTED    Status = 3
-)
-
-type Visibility int
-
-const (
-	PUBLIC  Visibility = 0
-	PRIVATE Visibility = 1
-)
-
 func DashboardURL() string {
 	// production:  https://dashboard.codenotary.io
 	// staging: 	https://dashboard.staging.codenotary.io

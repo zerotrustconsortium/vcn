@@ -153,59 +153,6 @@ func getDockerHash(param string) (hash string) {
 	return dockerHashStr
 }
 
-func getLevelName(level int) (name string) {
-	switch level {
-	case int(UNKNOWN):
-		return "UNKNOWN"
-	case int(EMAIL_VERIFIED):
-		return "EMAIL_VERIFIED"
-	case int(SOCIAL_VERIFIED):
-		return "SOCIAL_VERIFIED"
-	case int(ID_VERIFIED):
-		return "ID_VERIFIED"
-	case int(LOCATION_VERIFIED):
-		return "LOCATION_VERIFIED"
-	case int(VCHAIN):
-		return "VCHAIN"
-	default:
-		return "UNKNOWN"
-	}
-}
-
-func getStatusName(status int) (name string) {
-	switch status {
-	case int(TRUSTED):
-		return "TRUSTED"
-	case int(UNTRUSTED):
-		return "UNTRUSTED"
-	case int(STATUS_UNKNOWN):
-		return "UNKNOWN"
-	case int(UNSUPPORTED):
-		return "UNSUPPORTED"
-	default:
-		return "UNTRUSTED"
-	}
-}
-
-func visibilityName(visibility Visibility) (name string) {
-	switch visibility {
-	case PUBLIC:
-		return "PUBLIC"
-	case PRIVATE:
-		return "PRIVATE"
-	default:
-		return ""
-	}
-}
-
-func visibilityForFlag(public bool) (visibility Visibility) {
-	if public {
-		return PUBLIC
-	} else {
-		return PRIVATE
-	}
-}
-
 func hashAsset(assetHash string) (metadataHash string, err error) {
 	_, owner, level, status, timestamp := verifyHash(assetHash)
 	metadata := fmt.Sprintf("%s-%d-%d-%d", owner, level, status, timestamp)
