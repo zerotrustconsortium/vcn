@@ -4,66 +4,17 @@
  * The full license information can be found under:
  * https://www.gnu.org/licenses/gpl-3.0.en.html
  *
- * Built on top of CLI (MIT license)
- * https://github.com/urfave/cli#overview
  */
 
 package main
 
 import (
-	"fmt"
 	"math/big"
 
-	"github.com/dghubble/sling"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/sirupsen/logrus"
 )
-
-type ArtifactVerifyTrackerRequest struct {
-	Client   string `json:"client"`
-	Filename string `json:"filename"`
-	Hash     string `json:"hash"`
-	Url      string `json:"url"`
-}
-
-func artifactVerifyTracker(hash string, filename string) {
-
-	// make sure the tracker does its analytics although the main
-	// thread against the BC has already finalized
-	defer WG.Done()
-
-	token, _ := LoadToken()
-
-	restError := new(Error)
-	client := sling.New().
-		Post(TrackingEvent() + "/verify")
-	if token != "" {
-		client = client.Add("Authorization", "Bearer "+token)
-	}
-	r, err := client.
-		BodyJSON(ArtifactVerifyTrackerRequest{
-			Client:   "VCN:" + VcnVersion,
-			Filename: filename,
-			Hash:     hash,
-		}).Receive(nil, restError)
-	if err != nil {
-		fmt.Println(err)
-
-	}
-	if r.StatusCode != 200 {
-
-		LOG.WithFields(logrus.Fields{
-			"errMsg": restError.Message,
-			"status": restError.Status,
-		}).Error("API analytics failed")
-	} else {
-		LOG.WithFields(logrus.Fields{
-			"hash": hash,
-		}).Info("Verify tracker / analytics written")
-	}
-
-}
 
 func verifyHash(hash string) (verified bool, owner string, level Level, status Status, timestamp int64) {
 	client, err := ethclient.Dial(MainNetEndpoint())

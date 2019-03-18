@@ -345,11 +345,9 @@ func verify(filename string) {
 	} else {
 		artifactHash = strings.TrimSpace(hash(filename))
 	}
-
-	// fire a go routine for the tracking that shall not delay the main user interaction
-	WG.Add(1)
-	go artifactVerifyTracker(artifactHash, filename)
-
+	if err := TrackVerify(artifactHash, filename); err != nil {
+		log.Fatal("TrackVerify failed", err)
+	}
 	verified, signer, level, status, timestamp := verifyHash(artifactHash)
 
 	LOG.WithFields(logrus.Fields{
@@ -394,7 +392,6 @@ func verify(filename string) {
 	fmt.Print(StatusName(status))
 	color.Unset()
 	fmt.Println()
-	WG.Wait()
 }
 
 func displayLatency() {
