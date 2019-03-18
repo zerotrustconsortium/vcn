@@ -287,7 +287,7 @@ func Sign(filename string, state Status, visibility Visibility) {
 
 	question, _ := reader.ReadString('\n')
 
-	if strings.TrimSpace(question) != "y" {
+	if strings.ToLower(strings.TrimSpace(question)) != "y" {
 
 		fmt.Println("Ok - exiting.")
 		os.Exit(0)
