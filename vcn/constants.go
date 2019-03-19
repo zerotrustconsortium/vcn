@@ -53,17 +53,17 @@ func LevelName(level Level) (name string) {
 	case LevelDisabled:
 		return "DISABLED"
 	case LevelUnknown:
-		return "UNKNOWN"
+		return "0 - UNKNOWN"
 	case LevelEmailVerified:
-		return "EMAIL_VERIFIED"
+		return "1 - EMAIL_VERIFIED"
 	case LevelSocialVerified:
-		return "SOCIAL_VERIFIED"
+		return "2 - SOCIAL_VERIFIED"
 	case LevelIdVerified:
-		return "ID_VERIFIED"
+		return "3 - ID_VERIFIED"
 	case LevelLocationVerified:
-		return "LOCATION_VERIFIED"
+		return "4 - LOCATION_VERIFIED"
 	case LevelVchain:
-		return "VCHAIN"
+		return "99 - VCHAIN"
 	default:
 		log.Fatal("unsupported level", name)
 		return "";
