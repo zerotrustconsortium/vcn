@@ -19,26 +19,38 @@ import (
 )
 
 func DashboardURL() string {
-	// production:  https://dashboard.codenotary.io
-	// staging: 	https://dashboard.staging.codenotary.io
-	return "https://dashboard.codenotary.io"
+	switch os.Getenv("STAGE") {
+	case "STAGING":
+		return "https://dashboard.staging.codenotary.io"
+	default:
+		return "https://dashboard.codenotary.io"
+	}
 }
 func MainNetEndpoint() string {
-	// production:  https://main.codenotary.io
-	// staging: 	https://main.staging.codenotary.io
-	return "https://main.codenotary.io"
+	switch os.Getenv("STAGE") {
+	case "STAGING":
+		return "https://main.staging.codenotary.io"
+	default:
+		return "https://main.codenotary.io"
+	}
 }
 
 func FoundationEndpoint() string {
-	// production: 	https://api.codenotary.io/foundation
-	// staging: 	https://api.staging.codenotary.io/foundation
-	return "https://api.codenotary.io/foundation"
+	switch os.Getenv("STAGE") {
+	case "STAGING":
+		return "https://api.staging.codenotary.io/foundation"
+	default:
+		return "https://api.codenotary.io/foundation"
+	}
 }
 
 func AssetsRelayContractAddress() string {
-	// production:  0x495021fe1a48a5b0c85ef1abd68c42cdfc7cda08
-	// staging: 	0xf1d4b9fe8290bb5718db5d46c313e7b266570c21
-	return "0x495021fe1a48a5b0c85ef1abd68c42cdfc7cda08"
+	switch os.Getenv("STAGE") {
+	case "STAGING":
+		return "0xf1d4b9fe8290bb5718db5d46c313e7b266570c21"
+	default:
+		return "0x495021fe1a48a5b0c85ef1abd68c42cdfc7cda08"
+	}
 }
 
 func StyleAffordance() (color.Attribute, color.Attribute, color.Attribute) {
