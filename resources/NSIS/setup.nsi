@@ -7,8 +7,8 @@
 ;General
 
   ;Name and file
-  Name "CodeNotary vcn 0.3.1"
-  OutFile "codenotary_vcn_0.3.1.exe"
+  Name "CodeNotary vcn 0.3.3"
+  OutFile "codenotary_vcn_0.3.3_setup.exe"
   Icon "vcn.ico"
   LicenseData "gpl3license.txt"
   
@@ -19,7 +19,7 @@
   InstallDirRegKey HKCU "Software\CodeNotary" ""
 
   ;Request application privileges for Windows Vista
-  RequestExecutionLevel user
+  RequestExecutionLevel admin
 
   SetCompressor /SOLID LZMA
 ;--------------------------------
@@ -68,13 +68,23 @@ Section "CodeNotary vcn cli tool" installation
   CreateDirectory "$INSTDIR"
   CreateShortCut "$INSTDIR\Uninstall.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\Uninstall.exe" 0
   CreateShortCut "$INSTDIR\vcn.lnk" "$INSTDIR\vcn.exe" "" "$INSTDIR\vcn.exe" 0
- 
+
+;create context menu  
+  WriteRegStr HKCR "*\shell" "" "CodeNotary verify"
+  WriteRegStr HKCR "*\shell\CodeNotary verify" "Icon" "$INSTDIR\vcn.exe,0" 
+  WriteRegStr HKCR "*\shell\CodeNotary verify\command" ""  '"$INSTDIR\vcn.exe" verify "%1"' 
+  
+  WriteRegStr HKCR "*\shell" "" "CodeNotary sign"
+  WriteRegStr HKCR "*\shell\CodeNotary sign" "Icon" "$INSTDIR\vcn.exe,0" 
+  WriteRegStr HKCR "*\shell\CodeNotary sign\command" "" '"$INSTDIR\vcn.exe" sign "%1"' 
+
+  
 ;write uninstall information to the registry
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\CodeNotary" "DisplayName" "vcn (remove only)"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\CodeNotary" "UninstallString" "$INSTDIR\Uninstall.exe"
  
   WriteUninstaller "$INSTDIR\Uninstall.exe"
- 
+  
 SectionEnd
 
   ;Language strings
@@ -98,8 +108,9 @@ Section "Uninstall"
 ;Delete Start Menu Shortcuts
   Delete "$DESKTOP\vcn.lnk"
 
- 
 ;Delete Uninstaller And Unistall Registry Entries
+  DeleteRegKey HKCR "*\shell\CodeNotary verify"
+  DeleteRegKey HKCR "*\shell\CodeNotary sign"
   DeleteRegKey /ifempty HKCU "SOFTWARE\CodeNotary"
   DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\CodeNotary"  
  
