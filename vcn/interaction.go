@@ -317,6 +317,7 @@ func Sign(filename string, state Status, visibility Visibility) {
 	// fmt.Println("Signer:\t", "<pubKey>")
 
 	WG.Wait()
+	waitForTermination()
 }
 
 func VerifyAll(files []string) {
@@ -381,6 +382,7 @@ func verify(filename string) {
 	fmt.Print(StatusName(verification.Status))
 	color.Unset()
 	fmt.Println()
+	waitForTermination()
 }
 
 func displayLatency() {
