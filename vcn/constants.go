@@ -13,7 +13,7 @@ import (
 	"sync"
 )
 
-const VcnVersion = "0.3.3"
+const VcnVersion = "0.3.4"
 const VcnDirectoryPermissions = 0700
 
 var WG sync.WaitGroup
