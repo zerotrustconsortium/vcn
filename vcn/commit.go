@@ -23,7 +23,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func commitHash(hash string, passphrase string, filename string, status Status, visibility Visibility) (ret bool, code int) {
+func commitHash(hash string, passphrase string, filename string, fileSize int64, status Status, visibility Visibility) (ret bool, code int) {
 	reader, err := firstFile(WalletDirectory())
 	if err != nil {
 		LOG.WithFields(logrus.Fields{
@@ -95,7 +95,7 @@ func commitHash(hash string, passphrase string, filename string, status Status, 
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = CreateArtifact(publicKey, filename, hash, visibility, status)
+	err = CreateArtifact(publicKey, filename, hash, fileSize, visibility, status)
 	if err != nil {
 		log.Fatal(err)
 	}

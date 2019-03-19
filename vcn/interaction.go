@@ -248,6 +248,7 @@ func Sign(filename string, state Status, visibility Visibility) {
 	}
 
 	var artifactHash string
+	var fileSize int64 = 0
 
 	// artifact types
 	if strings.HasPrefix(filename, "docker:") {
@@ -262,7 +263,11 @@ func Sign(filename string, state Status, visibility Visibility) {
 	} else {
 		// file mode
 		artifactHash = hash(filename)
-
+		fi, err := os.Stat(filename);
+		if err != nil {
+			log.Fatal(err)
+		}
+		fileSize = fi.Size()
 	}
 
 	reader := bufio.NewReader(os.Stdin)
@@ -304,7 +309,7 @@ func Sign(filename string, state Status, visibility Visibility) {
 	_ = TrackSign(artifactHash, filepath.Base(filename), state)
 
 	// TODO: return and display: block #, trx #
-	_, _ = commitHash(artifactHash, string(passphrase), filepath.Base(filename), state, visibility)
+	_, _ = commitHash(artifactHash, string(passphrase), filepath.Base(filename), fileSize, state, visibility)
 	fmt.Println("")
 	fmt.Println("Asset:\t", filename)
 	fmt.Println("Hash:\t", artifactHash)

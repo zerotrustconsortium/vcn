@@ -20,6 +20,7 @@ type ArtifactRequest struct {
 	Name       string `json:"name"`
 	Hash       string `json:"hash"`
 	Filename   string `json:"filename"`
+	FileSize   int64  `json:"fileSize"`
 	Url        string `json:"url"`
 	License    string `json:"license"`
 	Visibility string `json:"visibility"`
@@ -48,7 +49,7 @@ func (a ArtifactResponse) String() string {
 		a.Name, a.Hash, a.Status)
 }
 
-func CreateArtifact(walletAddress string, name string, hash string, visibility Visibility, status Status) error {
+func CreateArtifact(walletAddress string, name string, hash string, fileSize int64, visibility Visibility, status Status) error {
 	restError := new(Error)
 	token, err := LoadToken()
 	if err != nil {
@@ -67,6 +68,7 @@ func CreateArtifact(walletAddress string, name string, hash string, visibility V
 			Name:       name,
 			Hash:       hash,
 			Filename:   name,
+			FileSize:   fileSize,
 			Visibility: VisibilityName(visibility),
 			Status:     StatusName(status),
 			MetaHash:   metaHash,
