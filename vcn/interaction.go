@@ -31,6 +31,8 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 )
 
+var displayProgress = true
+
 func dashboard() {
 	// open dashboard
 	// we intentionally do not read the customer's token from disk
@@ -227,7 +229,7 @@ func login(in *os.File) {
 }
 
 // Commit => "sign"
-func Sign(filename string, state Status, visibility Visibility) {
+func Sign(filename string, state Status, visibility Visibility, quit bool) {
 
 	// check for token
 	token, _ := LoadToken()
@@ -317,15 +319,26 @@ func Sign(filename string, state Status, visibility Visibility) {
 	// fmt.Println("Signer:\t", "<pubKey>")
 
 	WG.Wait()
-	waitForTermination()
+	displayProgress = false
+	if !quit {
+		if _, err := fmt.Scanln(); err != nil {
+			log.Fatal(err)
+		}
+	}
 }
 
-func VerifyAll(files []string) {
+func VerifyAll(files []string, quit bool) {
 	_ = TrackPublisher("VCN_VERIFY")
 	for _, file := range files {
 		verify(file)
 	}
+	if !quit {
+		if _, err := fmt.Scanln(); err != nil {
+			log.Fatal(err)
+		}
+	}
 }
+
 func verify(filename string) {
 
 	var artifactHash string
@@ -382,12 +395,11 @@ func verify(filename string) {
 	fmt.Print(StatusName(verification.Status))
 	color.Unset()
 	fmt.Println()
-	waitForTermination()
 }
 
 func displayLatency() {
 	i := 0
-	for {
+	for displayProgress {
 		i++
 		fmt.Printf("\033[2K\rIn progress %02dsec", i)
 		// fmt.Println(i)

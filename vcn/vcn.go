@@ -24,6 +24,7 @@ func main() {
 	CreateVcnDirectories()
 
 	var publicSigning = false
+	var quit = true
 
 	LOG.WithFields(logrus.Fields{
 		"version": VcnVersion,
@@ -44,11 +45,12 @@ func main() {
 				if c.NArg() == 0 {
 					return fmt.Errorf("assets required")
 				}
-				VerifyAll(c.Args())
+				VerifyAll(c.Args(), quit)
 				return nil
 			},
 			Flags: []cli.Flag{
 				cli.BoolFlag{Name: "hash"},
+				cli.BoolFlag{Name: "quit", Destination: &quit},
 			},
 		},
 		{
@@ -60,11 +62,12 @@ func main() {
 				if c.NArg() == 0 {
 					return fmt.Errorf("filename or type:reference required")
 				}
-				Sign(c.Args().First(), StatusTrusted, VisibilityForFlag(publicSigning))
+				Sign(c.Args().First(), StatusTrusted, VisibilityForFlag(publicSigning), quit)
 				return nil
 			},
 			Flags: []cli.Flag{
 				cli.BoolFlag{Name: "public", Destination: &publicSigning},
+				cli.BoolFlag{Name: "quit", Destination: &quit},
 			},
 		},
 		{
@@ -76,11 +79,12 @@ func main() {
 				if c.NArg() == 0 {
 					return fmt.Errorf("filename or type:reference required")
 				}
-				Sign(c.Args().First(), StatusUntrusted, VisibilityForFlag(publicSigning))
+				Sign(c.Args().First(), StatusUntrusted, VisibilityForFlag(publicSigning), quit)
 				return nil
 			},
 			Flags: []cli.Flag{
 				cli.BoolFlag{Name: "public", Destination: &publicSigning},
+				cli.BoolFlag{Name: "quit", Destination: &quit},
 			},
 		},
 		{
@@ -92,11 +96,12 @@ func main() {
 				if c.NArg() == 0 {
 					return fmt.Errorf("filename or type:reference required")
 				}
-				Sign(c.Args().First(), StatusUnsupported, VisibilityForFlag(publicSigning))
+				Sign(c.Args().First(), StatusUnsupported, VisibilityForFlag(publicSigning), quit)
 				return nil
 			},
 			Flags: []cli.Flag{
 				cli.BoolFlag{Name: "public", Destination: &publicSigning},
+				cli.BoolFlag{Name: "quit", Destination: &quit},
 			},
 		},
 		{

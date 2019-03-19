@@ -17,7 +17,6 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	"runtime"
 	"strings"
 	"syscall"
 
@@ -163,12 +162,4 @@ func hashAsset(assetHash string) (metadataHash string, err error) {
 		verification.Level, verification.Status, verification.Timestamp.Unix())
 	metadataHashAsBytes := sha256.Sum256([]byte(metadata))
 	return fmt.Sprintf("%x", metadataHashAsBytes), nil
-}
-
-func waitForTermination() {
-	if runtime.GOOS == "windows" && "" == os.Getenv("PROMPT") {
-		if _, err := fmt.Scanln(); err != nil {
-			log.Fatal(err)
-		}
-	}
 }
