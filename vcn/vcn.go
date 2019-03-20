@@ -20,17 +20,14 @@ import (
 )
 
 func main() {
-	InitLogging()
-	CreateVcnDirectories()
-
 	var publicSigning bool
 	var quit bool
-
+	InitLogging()
+	CreateVcnDirectories()
 	app := cli.NewApp()
 	app.Name = "vcn"
 	app.Usage = "code signing made easy"
 	app.Version = VcnVersion
-
 	app.Commands = []cli.Command{
 		{
 			Category: "Artifact actions",
