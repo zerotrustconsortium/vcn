@@ -154,7 +154,7 @@ func getDockerHash(param string) (hash string) {
 }
 
 func hashAsset(assetHash string) (metadataHash string, err error) {
-	verification, err := VerifyHash(assetHash)
+	verification, err := BlockChainVerify(assetHash)
 	if err != nil {
 		return "", err
 	}

@@ -13,6 +13,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/sirupsen/logrus"
 )
 
 type BlockchainVerification struct {
@@ -22,7 +23,10 @@ type BlockchainVerification struct {
 	Timestamp time.Time
 }
 
-func VerifyHash(hash string) (verification *BlockchainVerification, err error) {
+func BlockChainVerify(hash string) (verification *BlockchainVerification, err error) {
+	LOG.WithFields(logrus.Fields{
+		"hash": hash,
+	}).Trace("BlockChainVerify")
 	client, err := ethclient.Dial(MainNetEndpoint())
 	if err != nil {
 		return nil, err

@@ -360,7 +360,7 @@ func verify(filename string) (success bool) {
 	if err := TrackVerify(artifactHash, filename); err != nil {
 		log.Fatal("TrackVerify failed", err)
 	}
-	verification, err := VerifyHash(artifactHash)
+	verification, err := BlockChainVerify(artifactHash)
 	if err != nil {
 		log.Fatal("unable to verify hash", err)
 	}
