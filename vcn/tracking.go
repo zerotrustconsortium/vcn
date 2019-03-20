@@ -10,6 +10,8 @@ package main
 
 import (
 	"fmt"
+
+	"github.com/sirupsen/logrus"
 )
 
 type VerifyArtifactTrackingEventRequest struct {
@@ -31,6 +33,10 @@ type PublisherTrackingEventRequest struct {
 }
 
 func TrackVerify(hash string, filename string) (err error) {
+	LOG.WithFields(logrus.Fields{
+		"hash":     hash,
+		"filename": filename,
+	}).Trace("TrackVerify")
 	restError := new(Error)
 	token, _ := LoadToken()
 	r, err := NewSling(token).
@@ -50,6 +56,9 @@ func TrackVerify(hash string, filename string) (err error) {
 }
 
 func TrackPublisher(event string) (err error) {
+	LOG.WithFields(logrus.Fields{
+		"event": event,
+	}).Trace("TrackPublisher")
 	restError := new(Error)
 	token, err := LoadToken()
 	if err != nil {
@@ -70,6 +79,11 @@ func TrackPublisher(event string) (err error) {
 }
 
 func TrackSign(hash string, filename string, status Status) (err error) {
+	LOG.WithFields(logrus.Fields{
+		"hash":     hash,
+		"filename": filename,
+		"status":   status,
+	}).Trace("TrackSign")
 	restError := new(Error)
 	token, err := LoadToken()
 	if err != nil {
