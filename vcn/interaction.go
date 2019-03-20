@@ -329,18 +329,23 @@ func Sign(filename string, state Status, visibility Visibility, quit bool) {
 
 func VerifyAll(files []string, quit bool) {
 	_ = TrackPublisher("VCN_VERIFY")
+	var success = true
 	for _, file := range files {
-		verify(file)
+		success = success && verify(file)
 	}
 	if !quit {
 		if _, err := fmt.Scanln(); err != nil {
 			log.Fatal(err)
 		}
 	}
+	if success {
+		os.Exit(0)
+	} else {
+		os.Exit(1)
+	}
 }
 
-func verify(filename string) {
-
+func verify(filename string) (success bool) {
 	var artifactHash string
 
 	// TODO: make this switch available for all functions
@@ -388,13 +393,15 @@ func verify(filename string) {
 	fmt.Print("Status:\t ")
 	if verification.Status == StatusTrusted {
 		color.Set(StyleSuccess())
+		success = true
 	} else {
 		color.Set(StyleError())
-		defer os.Exit(1)
+		success = false
 	}
 	fmt.Print(StatusName(verification.Status))
 	color.Unset()
 	fmt.Println()
+	return success
 }
 
 func displayLatency() {

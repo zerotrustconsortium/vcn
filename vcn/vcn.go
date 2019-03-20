@@ -23,8 +23,8 @@ func main() {
 	InitLogging()
 	CreateVcnDirectories()
 
-	var publicSigning = false
-	var quit = true
+	var publicSigning bool
+	var quit bool
 
 	LOG.WithFields(logrus.Fields{
 		"version": VcnVersion,

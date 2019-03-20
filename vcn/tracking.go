@@ -32,10 +32,7 @@ type PublisherTrackingEventRequest struct {
 
 func TrackVerify(hash string, filename string) (err error) {
 	restError := new(Error)
-	token, err := LoadToken()
-	if err != nil {
-		return err
-	}
+	token, _ := LoadToken()
 	r, err := NewSling(token).
 		Post(TrackingEvent() + "/verify").
 		BodyJSON(VerifyArtifactTrackingEventRequest{
