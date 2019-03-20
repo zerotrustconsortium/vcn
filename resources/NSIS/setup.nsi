@@ -7,8 +7,8 @@
 ;General
 
   ;Name and file
-  Name "CodeNotary vcn 0.3.3"
-  OutFile "codenotary_vcn_0.3.3_setup.exe"
+  Name "CodeNotary vcn 0.3.4"
+  OutFile "codenotary_vcn_0.3.4_setup.exe"
   Icon "vcn.ico"
   LicenseData "gpl3license.txt"
   
@@ -58,6 +58,7 @@ Section "CodeNotary vcn cli tool" installation
   SetOutPath "$INSTDIR"
  
   File "vcn.exe"
+  File "vcn.ico"
   File "gpl3license.txt"
  
 ;create desktop shortcut
@@ -71,11 +72,11 @@ Section "CodeNotary vcn cli tool" installation
 
 ;create context menu  
   WriteRegStr HKCR "*\shell" "" "CodeNotary verify"
-  WriteRegStr HKCR "*\shell\CodeNotary verify" "Icon" "$INSTDIR\vcn.exe,0" 
-  WriteRegStr HKCR "*\shell\CodeNotary verify\command" ""  '"$INSTDIR\vcn.exe" verify "%1"' 
+  WriteRegStr HKCR "*\shell\CodeNotary verify" "Icon" "$INSTDIR\vcn.ico,0" 
+  WriteRegStr HKCR "*\shell\CodeNotary verify\command" ""  '"$INSTDIR\vcn.exe" verify -q=false "%1"' 
   
   WriteRegStr HKCR "*\shell" "" "CodeNotary sign"
-  WriteRegStr HKCR "*\shell\CodeNotary sign" "Icon" "$INSTDIR\vcn.exe,0" 
+  WriteRegStr HKCR "*\shell\CodeNotary sign" "Icon" "$INSTDIR\vcn.ico,0" 
   WriteRegStr HKCR "*\shell\CodeNotary sign\command" "" '"$INSTDIR\vcn.exe" sign "%1"' 
 
   
