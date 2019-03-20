@@ -50,7 +50,7 @@ func main() {
 			},
 			Flags: []cli.Flag{
 				cli.BoolFlag{Name: "hash"},
-				cli.BoolFlag{Name: "quit, q", Destination: &quit},
+				cli.BoolTFlag{Name: "quit, q", Destination: &quit},
 			},
 		},
 		{
@@ -67,7 +67,7 @@ func main() {
 			},
 			Flags: []cli.Flag{
 				cli.BoolFlag{Name: "public, p", Destination: &publicSigning},
-				cli.BoolFlag{Name: "quit, q", Destination: &quit},
+				cli.BoolTFlag{Name: "quit, q", Destination: &quit},
 			},
 		},
 		{
@@ -84,7 +84,7 @@ func main() {
 			},
 			Flags: []cli.Flag{
 				cli.BoolFlag{Name: "public, p", Destination: &publicSigning},
-				cli.BoolFlag{Name: "quit, q", Destination: &quit},
+				cli.BoolTFlag{Name: "quit, q", Destination: &quit},
 			},
 		},
 		{
@@ -101,7 +101,7 @@ func main() {
 			},
 			Flags: []cli.Flag{
 				cli.BoolFlag{Name: "public, p", Destination: &publicSigning},
-				cli.BoolFlag{Name: "quit, q", Destination: &quit},
+				cli.BoolTFlag{Name: "quit, q", Destination: &quit},
 			},
 		},
 		{
