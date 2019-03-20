@@ -19,35 +19,52 @@ import (
 )
 
 func DashboardURL() string {
-	switch os.Getenv("STAGE") {
-	case "STAGING":
+	switch StageEnvironment() {
+	case StageProduction:
+		return "https://dashboard.codenotary.io"
+	case StageStaging:
 		return "https://dashboard.staging.codenotary.io"
+	case StageTest:
+		return "https://dashboard.test.codenotary.io"
 	default:
 		return "https://dashboard.codenotary.io"
 	}
 }
+
 func MainNetEndpoint() string {
-	switch os.Getenv("STAGE") {
-	case "STAGING":
+	switch StageEnvironment() {
+	case StageProduction:
+		return "https://main.codenotary.io"
+	case StageStaging:
 		return "https://main.staging.codenotary.io"
+	case StageTest:
+		return "https://main.test.codenotary.io"
 	default:
 		return "https://main.codenotary.io"
 	}
 }
 
 func FoundationEndpoint() string {
-	switch os.Getenv("STAGE") {
-	case "STAGING":
+	switch StageEnvironment() {
+	case StageProduction:
+		return "https://api.codenotary.io/foundation"
+	case StageStaging:
 		return "https://api.staging.codenotary.io/foundation"
+	case StageTest:
+		return "https://api.test.codenotary.io/foundation"
 	default:
 		return "https://api.codenotary.io/foundation"
 	}
 }
 
 func AssetsRelayContractAddress() string {
-	switch os.Getenv("STAGE") {
-	case "STAGING":
+	switch StageEnvironment() {
+	case StageProduction:
+		return "0x495021fe1a48a5b0c85ef1abd68c42cdfc7cda08"
+	case StageStaging:
 		return "0xf1d4b9fe8290bb5718db5d46c313e7b266570c21"
+	case StageTest:
+		return "0x0"
 	default:
 		return "0x495021fe1a48a5b0c85ef1abd68c42cdfc7cda08"
 	}

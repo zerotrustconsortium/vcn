@@ -94,7 +94,7 @@ func VisibilityName(visibility Visibility) (name string) {
 		return "PRIVATE"
 	default:
 		log.Fatal("unsupported visibility", name)
-		return "";
+		return ""
 	}
 }
 

@@ -26,10 +26,6 @@ func main() {
 	var publicSigning bool
 	var quit bool
 
-	LOG.WithFields(logrus.Fields{
-		"version": VcnVersion,
-	}).Trace("VCN")
-
 	app := cli.NewApp()
 	app.Name = "vcn"
 	app.Usage = "code signing made easy"
@@ -140,6 +136,10 @@ func main() {
 			},
 		},
 	}
+	LOG.WithFields(logrus.Fields{
+		"version": VcnVersion,
+		"stage":   StageName(StageEnvironment()),
+	}).Trace("VCN")
 	if err := app.Run(os.Args); err != nil {
 		log.Fatal(err)
 	}
