@@ -31,6 +31,9 @@ func commitHash(hash string, passphrase string, filename string, fileSize int64,
 		}).Fatal("Could not load keystore")
 	}
 	transactor, err := bind.NewTransactor(reader, passphrase)
+	if err != nil {
+		log.Fatal(err)
+	}
 	walletSynced, err := isWalletSynced(transactor.From.Hex())
 	if err != nil {
 		LOG.WithFields(logrus.Fields{
